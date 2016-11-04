@@ -7,9 +7,12 @@
 function init()
 	ns = 10
    nt = robot.random.uniform_int(0,ns+1)
-	inventory = {}
+   nm = 30
+   turning = 0
+   inventory = {}
 	robot.wheels.set_velocity(5,5)
 	robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
+    robot.colored_blob_omnidirectional_camera.enable()
 end
 
 
@@ -17,9 +20,15 @@ end
 --[[ This function is executed at each time step
      It must contain the logic of your controller ]]
 function step()
-	nt = nt + 1
 	walk()
-	local received = table.shuffle(robot.range_and_bearing)
+        
+        if #robot.colored_blob_omnidirectional_camera > 0 then
+            play()
+        end
+end
+
+function play()
+        local received = table.shuffle(robot.range_and_bearing)
 	for i = 1,#received do
 		local w = received[i].data
 		if w[i] ~= 0 then
@@ -90,26 +99,18 @@ function table_to_word(t)
 end
 
 function walk()
-	local p = robot.proximity
-	max = 0
-	max_id = 0
-	for i = 1,6 do
-		if p[i].value > max then
-			max = p[i].value
-			max_id = i
+	if(turning>0) then
+   	turning = turning-1
+		if(turning==0) then
+			nt = nt + 1
 		end
-	end
-	for i = 19,24 do
-		if p[i].value > max then
-			max = p[i].value
-			max_id = i
-		end
-	end
-	if max > 0 then
-		robot.wheels.set_velocity(5*p[max_id].angle + 1,-5*p[max_id].angle + 1)
-	else
-		robot.wheels.set_velocity(5,5)
-	end
+   elseif(nt%nm==0) then
+      robot.wheels.set_velocity(-10,10)
+      turning = robot.random.uniform_int(0,40)
+   else
+      nt = nt + 1
+      robot.wheels.set_velocity(5,5)
+   end
 end
 
 function table.copy(t)
