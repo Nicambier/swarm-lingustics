@@ -7,12 +7,15 @@
 function init()
 	ns = 10
    nt = robot.random.uniform_int(0,ns+1)
-   nm = 30
+   nm = 100
    turning = 0
    inventory = {}
+   inventory["blue"] = {}
+   inventory["red"] = {}
 	robot.wheels.set_velocity(5,5)
 	robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
     robot.colored_blob_omnidirectional_camera.enable()
+    topic = ""
 end
 
 
@@ -23,6 +26,14 @@ function step()
 	walk()
         
         if #robot.colored_blob_omnidirectional_camera > 0 then
+            if robot.colored_blob_omnidirectional_camera[1].color.red > 0 then
+                topic = "red"
+            else
+                topic = "blue"
+            end
+        end
+            
+        if #topic > 0 then
             play()
         end
 end
@@ -38,35 +49,35 @@ function play()
 
 	if nt % ns == 0 then	
 		local selectedW
-		if #inventory==0 then
+		if #inventory[topic]==0 then
 			selectedW = create_word()
 		else
-			selectedW = inventory[robot.random.uniform_int(1,#inventory+1)]
+			selectedW = inventory[topic][robot.random.uniform_int(1,#inventory+1)]
 		end	
 		robot.range_and_bearing.set_data(word_to_table(selectedW))
 	else
 		robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
 	end
 
-	if #inventory==1 then
-		log(inventory[1])
+	if #inventory[topic]==1 then
+		log(topic.." = "..inventory[topic][1].." (red: "..#inventory["red"]..", blue: "..#inventory["blue"]..")")
 	else
-		log("no convergence")
+		log(topic.." = ".."no convergence")
 	end
 end
 
 function update_inventory(w)
 	local inside = false
-	for i = 1,#inventory do
-		if inventory[i]==w then
+	for i = 1,#inventory[topic] do
+		if inventory[topic][i]==w then
 			inside = true
 		end
 	end
 
 	if inside then
-		inventory = {w}
+		inventory[topic] = {w}
 	else
-		inventory[#inventory+1] = w
+		inventory[topic][#inventory+1] = w
 	end	
 end
 
