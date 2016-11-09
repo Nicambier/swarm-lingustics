@@ -74,14 +74,14 @@
     
     
     <light id="l0"
-           position="0,0.9,0.5"
+           position="0,1.8,0.5"
            orientation="0,0,0"
            color="red"
            intensity="1.0"
            medium="leds"/>
     
     <light id="l1"
-           position="0,-0.9,0.5"
+           position="0,-1.8,0.5"
            orientation="0,0,0"
            color="blue"
            intensity="1.0"
