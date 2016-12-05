@@ -8,6 +8,11 @@
     <experiment length="0" ticks_per_second="10"  random_seed="124" />
     <system threads="0" />
   </framework>
+  
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions label="language_game" output="outputNG2.txt" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -108,7 +113,8 @@
   <!-- * Visualization * -->
   <!-- ****************** -->
   <visualization>
-    <qt-opengl lua_editor="true">
+    <qt-opengl lua_editor="false">
+      <user_functions library="libid_loop_functions" label="word_qtuser_functions" />
       <camera>
         <placement idx="0" position="-2.0767,0.015,2.74921" look_at="-1.59254,0.015,1.87423" lens_focal_length="20" />
       </camera>

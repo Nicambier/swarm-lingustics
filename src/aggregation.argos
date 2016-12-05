@@ -7,6 +7,11 @@
   <framework>
     <experiment length="0" ticks_per_second="10" />
   </framework>
+  
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions label="language_game" output="outputAgg.txt" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -23,9 +28,9 @@
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="true" />
+        <footbot_proximity implementation="default" show_rays="false" />
         <footbot_motor_ground implementation="rot_z_only" />
-        <range_and_bearing implementation="medium" medium="rab" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
       <!-- No required configuration -->
       <params script="aggregation.lua" />
@@ -87,7 +92,9 @@
     <!-- ************************************************************************ -->
     <!-- * To activate the Lua editor, just use the 'lua_editor' flag attribute * -->
     <!-- ************************************************************************ -->
-    <qt-opengl lua_editor="true">
+      
+    <qt-opengl lua_editor="false">
+      <user_functions library="libid_loop_functions" label="word_qtuser_functions" />
       <camera>
         <placement idx="0" position="-0.00569879,0.01,4.86243" look_at="-0.00569879,0.01,3.86243" lens_focal_length="20" />
         <placement idx="1" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />

@@ -1,5 +1,6 @@
 -- Put your global variables here
-
+RED = "red"
+BLUE = "blue"
 
 
 --[[ This function is executed every time you press the 'execute'
@@ -10,8 +11,8 @@ function init()
    nm = 100
    turning = 0
    inventory = {}
-   inventory["blue"] = {}
-   inventory["red"] = {}
+   inventory[BLUE] = {}
+   inventory[RED] = {}
 	robot.wheels.set_velocity(5,5)
 	robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
     robot.colored_blob_omnidirectional_camera.enable()
@@ -27,9 +28,9 @@ function step()
         
         if #robot.colored_blob_omnidirectional_camera > 0 then
             if robot.colored_blob_omnidirectional_camera[1].color.red > 0 then
-                topic = "red"
+                topic = RED
             else
-                topic = "blue"
+                topic = BLUE
             end
         end
             
@@ -59,11 +60,6 @@ function play()
 		robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
 	end
 
-	if #inventory[topic]==1 then
-		log(topic.." = "..inventory[topic][1].." (red: "..#inventory["red"]..", blue: "..#inventory["blue"]..")")
-	else
-		log(topic.." = ".."no convergence")
-	end
 end
 
 function update_inventory(w)
@@ -122,6 +118,14 @@ function walk()
       nt = nt + 1
       robot.wheels.set_velocity(5,5)
    end
+end
+
+function getWord()
+    if topic=="" or #inventory[topic]~=1 then
+        return "_"
+    else
+        return inventory[topic][1]
+    end
 end
 
 function table.copy(t)

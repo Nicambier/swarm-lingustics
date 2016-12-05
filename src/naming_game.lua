@@ -38,12 +38,6 @@ function step()
 	else
 		robot.range_and_bearing.set_data({0,0,0,0,0,0,0,0,0,0})
 	end
-
-	if #inventory==1 then
-		log(inventory[1])
-	else
-		log("no convergence")
-	end
 end
 
 function update_inventory(w)
@@ -110,6 +104,14 @@ function walk()
 	else
 		robot.wheels.set_velocity(5,5)
 	end
+end
+
+function getWord()
+    if #inventory==1 then
+        return inventory[1]
+    else
+        return "_"
+    end
 end
 
 function table.copy(t)

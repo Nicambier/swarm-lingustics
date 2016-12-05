@@ -1,0 +1,11 @@
+To test the code in src/, set the environment variable ARGOS_PLUGIN_PATH to the full path in which the build/ directory is located: 
+export ARGOS_PLUGIN_PATH=/path/to/swarm-linguistics/src/build/
+Then go to the build directory and make the source code:
+cd src/build
+make
+
+To test the naming game with kilobots, first type
+export ARGOS_PLUGIN_PATH=/path/to/swarm-linguistics/argos3-kilobot-master/build/plugins/robots/kilobot
+you can then try the naming game from the kilobot folder by typing:
+cd argos3-kilobot-master
+argos3 -c src/examples/experiments/kilobot_gradient_simple.argos

@@ -64,7 +64,9 @@ function step()
                 Leave()
             end
         end
-    end        
+    end
+    
+    --log(getWord())
 end
 
 function Stay()
@@ -92,7 +94,7 @@ function OnSpot()
 	max = 0
 	max_id = 0
 	for i = 1,#s do
-		if s[i].value == 0 then
+		if s[i].value < 0.8 then
 			return true
 		end
 	end
@@ -123,7 +125,6 @@ function UpdateLexicon(w)
             
             if inside then
                 inventory = {w}
-                log(w)
             else
                 inventory[#inventory+1] = w
             end
@@ -150,6 +151,14 @@ function CountRAB()
                     number_robot_sensed = number_robot_sensed + 1 -- increase the counter
 		end
 	end
+end
+
+function getWord()
+    if #inventory==1 then
+        return inventory[1]
+    else
+        return "_"
+    end
 end
 
 -- init/reset/destroy

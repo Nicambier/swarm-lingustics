@@ -1,0 +1,4 @@
+/home/nicolas/Documents/swarm-lingustics/src/build/CMakeFiles/edit_cache.dir
+/home/nicolas/Documents/swarm-lingustics/src/build/CMakeFiles/word_loop_functions.dir
+/home/nicolas/Documents/swarm-lingustics/src/build/CMakeFiles/rebuild_cache.dir
+/home/nicolas/Documents/swarm-lingustics/src/build/CMakeFiles/language_game.dir
