@@ -9,7 +9,6 @@ leaving_turns = 0
 staying_turns = 0
 avoiding_turns = 0
 number_robot_sensed = 0
-inventory = {}
 
 -- CONST
 STAYING_TURNS = 200
@@ -50,11 +49,7 @@ function step()
         staying_turns = staying_turns - 1
         robot.wheels.set_velocity(0,0)
         
-        local data = math.random(255) --create a new word
-        if #inventory > 0 then --or choose a word if we have some
-            data = inventory[math.random(#inventory)]
-        end
-            robot.range_and_bearing.set_data(1,data) -- send the word to the other robots
+        robot.range_and_bearing.set_data(1,1) -- send the word to the other robots
         
         if staying_turns == 0 then
             CountRAB()
@@ -113,66 +108,33 @@ function SenseObstacle()
 	end
 	return false
 end
-                                              
-function UpdateLexicon(w)
-        local inside = false
-        if w > 0 then
-            for i = 1,#inventory do
-                if inventory[i]==w then
-                    inside = true
-                end
-            end
-
-            
-            if inside then
-                inventory = {w}
-            else
-                inventory[#inventory+1] = w
-            end
-        end
-        return inside
-end
             
 
--- Count the number of robots sensed close to the robot
 function CountRAB()
     local converged = false
     number_robot_sensed = 0
-	for i = 1, #robot.range_and_bearing do -- for each robot seen
-                if UpdateLexicon(robot.range_and_bearing[i].data[1]) then
-                    if(not converged) then
-                        converged = true
-                        number_robot_sensed = 0
-                    end
-                else
-                    converged = false
-                end
-                                              
-		if robot.range_and_bearing[i].range < 150 and converged then -- see if they are close enough. What happens if we don't put a distance cutoff here?
+	for i = 1, #robot.range_and_bearing do -- for each robot seen                                              
+		if robot.range_and_bearing[i].range < 150 and robot.range_and_bearing[i].data[1] ~= 0 then
                     number_robot_sensed = number_robot_sensed + 1 -- increase the counter
 		end
 	end
 end
 
 function getWord()
-    if #inventory==1 then
-        return inventory[1]
-    else
-        return "_"
-    end
+    return "_"
 end
 
 -- init/reset/destroy
 function init()
    current_state = WALK
 end
+
 function reset()
 	current_state = WALK
 	avoiding_turns = 0
 	number_robot_sensed = 0
 	staying_turns = 0
 	leaving_turns = 0
-    inventory = {}
 end
 function destroy()
 end

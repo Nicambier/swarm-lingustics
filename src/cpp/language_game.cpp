@@ -32,14 +32,14 @@ CLanguageGame::~CLanguageGame() {
 
 void CLanguageGame::Init(TConfigurationNode& t_tree) {
    /* Get output file name from XML tree */
-   GetNodeAttribute(t_tree, "output", m_strOutFile);
+   //GetNodeAttribute(t_tree, "output", m_strOutFile);
    /* Open the file for text writing */
-   m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+   /*m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
-   }
+   }*/
    /* Write a header line */
-   m_cOutFile << "Word\t# Bots\t" << std::endl;
+   //m_cOutFile << "Word\t# Bots\t" << std::endl;
 }
 
 /****************************************/
@@ -47,17 +47,17 @@ void CLanguageGame::Init(TConfigurationNode& t_tree) {
 
 void CLanguageGame::Reset() {
    /* Close the output file */
-   m_cOutFile.close();
+   /*m_cOutFile.close();
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error closing file \"" << m_strOutFile << "\": " << ::strerror(errno));
-   }
+   }*/
    /* Open the file for text writing */
-   m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+   /*m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
-   }
+   }*/
    /* Write a header line */
-   m_cOutFile << "Word\t# Bots\t" << std::endl;
+   //m_cOutFile << "Word\t# Bots\t" << std::endl;
 }
 
 /****************************************/
@@ -65,10 +65,10 @@ void CLanguageGame::Reset() {
 
 void CLanguageGame::Destroy() {
    /* Close the output file */
-   m_cOutFile.close();
+   /*m_cOutFile.close();
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error closing file \"" << m_strOutFile << "\": " << ::strerror(errno));
-   }
+   }*/
 }
 
 /****************************************/
@@ -82,11 +82,11 @@ void CLanguageGame::PreStep() {
 /****************************************/
 
 void CLanguageGame::PostStep() {
-    std::string txt = "caca";
+    //std::string txt = "caca";
    /* Output a line for this step */
-   m_cOutFile << txt << "\t"
+   /*m_cOutFile << txt << "\t"
               << 1 << "\t"
-              << std::endl;
+              << std::endl;*/
 }
 
 /****************************************/

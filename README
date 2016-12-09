@@ -1,6 +1,6 @@
 To test the code in src/, set the environment variable ARGOS_PLUGIN_PATH to the full path in which the build/ directory is located: 
 export ARGOS_PLUGIN_PATH=/path/to/swarm-linguistics/src/build/
-Then go to the build directory and make the source code:
+Then go to the build directory and compile the source code:
 cd src/build
 make
 

@@ -34,7 +34,7 @@
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
       <!-- No required configuration -->
-      <params script="aggregation.lua" />
+      <params script="aggregation_no_NG.lua" />
     </lua_controller>
 
   </controllers>
