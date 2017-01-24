@@ -128,7 +128,7 @@ end
 
 function stopProba(N)
     return BASE_STAY_PROBA * (number_robot_sensed + 1) -- +1 to account for the robot itself
-    ---[[
+    --[[
     if N==0 then
         return 0.03
     elseif N==1 then
