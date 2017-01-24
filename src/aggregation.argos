@@ -43,7 +43,7 @@
   <!-- * Arena configuration * -->
   <!-- *********************** -->
   <arena size="6, 7.5, 1" center="0,0,0.5">
-    <floor id="f" source="image" path="two_spots.png" />
+      <floor id="g" source="image" path="two_spots.png" /> <!--Can't delete that because of the getFloorColour() function in the c file-->
 
     <box id="bn" size="0.1, 7.5, 0.2" movable="false">
       <body position="3,0,0"  orientation="0,0,0" />
@@ -61,7 +61,7 @@
     <distribute>
       <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="20" max_trials="100"> 
+      <entity quantity="100" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="lua" />

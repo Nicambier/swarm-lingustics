@@ -9,6 +9,7 @@ leaving_turns = 0
 staying_turns = 0
 avoiding_turns = 0
 number_robot_sensed = 0
+inventory = {}
 
 -- CONST
 STAYING_TURNS = 200
@@ -23,7 +24,12 @@ function step()
     if current_state == WALK then
         robot.wheels.set_velocity(10,10)
         if OnSpot() then
-            Stay()
+            if staying_turns == 0 then
+                CountRAB()
+                if robot.random.uniform() < stopProba(number_robot_sensed) then -- stay
+                    Stay()
+                end
+            end
         elseif SenseObstacle() then
             Avoid()
         end
@@ -49,12 +55,9 @@ function step()
         staying_turns = staying_turns - 1
         robot.wheels.set_velocity(0,0)
         
-        robot.range_and_bearing.set_data(1,1) -- send the word to the other robots
-        
         if staying_turns == 0 then
             CountRAB()
-            local proba = BASE_STAY_PROBA * (number_robot_sensed + 1) -- +1 to account for the robot itself
-            if robot.random.uniform() < proba then -- stay
+            if robot.random.uniform() < stopProba(number_robot_sensed) then -- stay
                 Stay()
             else
                 Leave()
@@ -68,6 +71,8 @@ end
 function Stay()
     current_state = STAY
     staying_turns = STAYING_TURNS
+    
+    robot.range_and_bearing.set_data(1,50) -- send the word to the other robots
 end
 
 function Leave()
@@ -94,7 +99,8 @@ function OnSpot()
 			return true
 		end
 	end
-	return false
+	--return false
+    return true
 end
 
 function SenseObstacle()
@@ -110,31 +116,45 @@ function SenseObstacle()
 end
             
 
+-- Count the number of robots sensed close to the robot
 function CountRAB()
-    local converged = false
     number_robot_sensed = 0
 	for i = 1, #robot.range_and_bearing do -- for each robot seen                                              
-		if robot.range_and_bearing[i].range < 150 and robot.range_and_bearing[i].data[1] ~= 0 then
+		if robot.range_and_bearing[i].range < 100 and robot.range_and_bearing[i].data[1] > 0 then -- see if they are close enough. What happens if we don't put a distance cutoff here?
                     number_robot_sensed = number_robot_sensed + 1 -- increase the counter
 		end
 	end
 end
 
+function stopProba(N)
+    return BASE_STAY_PROBA * (number_robot_sensed + 1) -- +1 to account for the robot itself
+    ---[[
+    if N==0 then
+        return 0.03
+    elseif N==1 then
+        return 0.42
+    elseif N==2 then
+        return 0.5
+    elseif N>=3 then
+        return 0.51
+    end--]]
+end
+
 function getWord()
-    return "_"
+    return ""
 end
 
 -- init/reset/destroy
 function init()
    current_state = WALK
 end
-
 function reset()
 	current_state = WALK
 	avoiding_turns = 0
 	number_robot_sensed = 0
 	staying_turns = 0
 	leaving_turns = 0
+    inventory = {}
 end
 function destroy()
 end
