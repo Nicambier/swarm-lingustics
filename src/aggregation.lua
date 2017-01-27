@@ -141,21 +141,15 @@ end
 
 -- Count the number of robots sensed close to the robot
 function CountRAB()
-    local converged = false
     number_robot_sensed = 0
 	for i = 1, #robot.range_and_bearing do -- for each robot seen
-        if UpdateLexicon(robot.range_and_bearing[i].data[1]) then
-            if(not converged) then
-                converged = true
+        --if robot.range_and_bearing[i].range < 100 then
+            if UpdateLexicon(robot.range_and_bearing[i].data[1]) then
+                number_robot_sensed = number_robot_sensed + 1 -- increase the counter
+            else
+                number_robot_sensed = 0
             end
-        else
-            converged = false
-            number_robot_sensed = 0
-        end
-                                              
-		if robot.range_and_bearing[i].range < 100 and converged then -- see if they are close enough. What happens if we don't put a distance cutoff here?
-                    number_robot_sensed = number_robot_sensed + 1 -- increase the counter
-		end
+        --end
 	end
 end
 

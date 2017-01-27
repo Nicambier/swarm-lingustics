@@ -120,7 +120,7 @@ end
 function CountRAB()
     number_robot_sensed = 0
 	for i = 1, #robot.range_and_bearing do -- for each robot seen                                              
-		if robot.range_and_bearing[i].range < 100 and robot.range_and_bearing[i].data[1] > 0 then -- see if they are close enough. What happens if we don't put a distance cutoff here?
+		if robot.range_and_bearing[i].data[1] > 0 then -- see if they are close enough. What happens if we don't put a distance cutoff here?
                     number_robot_sensed = number_robot_sensed + 1 -- increase the counter
 		end
 	end
