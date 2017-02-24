@@ -34,7 +34,7 @@
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
       <!-- No required configuration -->
-      <params script="aggregation.lua" />
+      <params script="agg_sahin.lua" />
     </lua_controller>
 
   </controllers>
@@ -61,9 +61,9 @@
     <distribute>
       <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="100" max_trials="100"> 
+      <entity quantity="40" max_trials="100"> 
         <foot-bot id="fb" 
-                  rab_range = "1">
+                  rab_range = "4">
           <controller config="lua" />
         </foot-bot>
       </entity> 
