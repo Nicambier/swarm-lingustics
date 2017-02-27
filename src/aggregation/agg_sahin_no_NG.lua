@@ -102,7 +102,7 @@ function Aim(front)
             sum = 0
             for msg = 1, #quadrants[side] do
                 x = quadrants[side][msg]
-                sum = sum + 1--50/x--math.exp^(-(x*x)/(2*(30*30)))
+                sum = sum + (1/75)*(2.71^(-(x*x)/(2*(30*30))))
             end
             if sum > best then
                 best = sum
