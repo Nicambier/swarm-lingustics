@@ -37,10 +37,10 @@ function step()
 
     elseif current_state == REPEL then
         Repel()
-        if SenseObstacle() then
-            Avoid()
-        elseif robot.random.uniform() < P_return then
+        if robot.random.uniform() < P_return then
             Approach()
+        elseif SenseObstacle() then
+            Avoid()
         end
         
     elseif current_state == WAIT then
@@ -81,7 +81,6 @@ end
 function Aim(front)
     dir = -1
     closest = -1
-    dir_closest = -1
 	for i = 1, #robot.range_and_bearing do -- for each robot seen                                              
 		if robot.range_and_bearing[i].data[1] > 0 then
             if UpdateLexicon(robot.range_and_bearing[i].data[1]) then
@@ -92,31 +91,29 @@ function Aim(front)
 		end
         if closest == -1 or robot.range_and_bearing[i].range < closest then
             closest = robot.range_and_bearing[i].range
-            dir_closest = robot.range_and_bearing[i].horizontal_bearing
         end
 	end
     
-    if closest >= 0 then
-        if closest < 20 then
-            robot_close = true
-        else
-            if dir==-1 then
-                dir = dir_closest
-            end
-            
-            if(front) then
-                if(math.abs(dir) < 0.5) then
-                    robot.wheels.set_velocity(10,10)
-                else
-                    robot.wheels.set_velocity(-dir*10,dir*10)
-                end
-            else
-                if(math.pi-math.abs(dir) < 0.5) then
-                    robot.wheels.set_velocity(10,10)
-                else
-                    robot.wheels.set_velocity((math.pi-dir)*10,(dir-math.pi)*10)
-                end
-            end        
+    if front and closest >= 0 and closest < 20 then
+        robot_close = true
+    elseif dir ~= -1 then
+        bestQuadrant = ""
+        if dir <= math.pi/4 and dir > -math.pi/4 then
+            bestQuadrant = "front"
+        elseif dir <= 3*math.pi/4 and dir > math.pi/4 then
+            bestQuadrant = "left"
+        elseif dir <= -3*math.pi/4 and dir > 3*math.pi/4 then
+            bestQuadrant = "back"
+        elseif dir <= -math.pi/4 and dir > -3*math.pi/4 then
+            bestQuadrant = "right"
+        end
+        
+        if (front and bestQuadrant == "front") or (not front and bestQuadrant == "back") then
+            robot.wheels.set_velocity(10,10)
+        elseif (front and (bestQuadrant == "back" or bestQuadrant == "left")) or (not front and (bestQuadrant == "front" or bestQuadrant == "right")) then
+            robot.wheels.set_velocity(0,10)
+        elseif (front and bestQuadrant == "right") or (not front and bestQuadrant == "left") then
+            robot.wheels.set_velocity(10,0)
         end
     else
         robot.wheels.set_velocity(10,10)

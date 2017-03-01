@@ -119,7 +119,7 @@ function stopProba(N)
 end
 
 function getWord()
-    return "_"
+    return current_state
 end
 
 -- init/reset/destroy

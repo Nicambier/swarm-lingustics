@@ -37,10 +37,10 @@ function step()
 
     elseif current_state == REPEL then
         Repel()
-        if SenseObstacle() then
-            Avoid()
-        elseif robot.random.uniform() < P_return then
+        if robot.random.uniform() < P_return then
             Approach()
+        elseif SenseObstacle() then
+            Avoid()
         end
         
     elseif current_state == WAIT then
@@ -88,7 +88,7 @@ function Aim(front)
             table.insert(quadrants.right,robot.range_and_bearing[i].range)
         end
         
-        if robot.range_and_bearing[i].range < 20 then
+        if front and robot.range_and_bearing[i].range < 20 then
             robot_close = true
         end
 	end
@@ -102,7 +102,7 @@ function Aim(front)
             sum = 0
             for msg = 1, #quadrants[side] do
                 x = quadrants[side][msg]
-                sum = sum + (1/75)*(2.71^(-(x*x)/(2*(30*30))))
+                sum = sum + (200-x)--(1/75)*(2.71^(-(x*x)/(2*(30*30))))
             end
             if sum > best then
                 best = sum
@@ -141,7 +141,7 @@ function SenseObstacle()
 end
 
 function getWord()
-    return "_"
+    return current_state
 end
 
 -- init/reset/destroy
