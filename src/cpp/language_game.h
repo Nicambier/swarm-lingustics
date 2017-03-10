@@ -48,13 +48,6 @@ public:
     */
    virtual void PostStep();
 
-   /**
-    * Returns the color of the floor at the specified point on.
-    * @param c_position_on_plane The position at which you want to get the color.
-    * @see CColor
-    */
-   virtual CColor GetFloorColor(const CVector2& c_position_on_plane);
-
 private:
 
 
