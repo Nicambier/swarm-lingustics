@@ -90,10 +90,10 @@ void loop()
     if(nt%ns!=0) { //listener
         // Set the LED green.
         set_color(RGB(0, 1, 0));
-        if(inventory_size==1)
+        /*if(inventory_size==1)
             printf("%d: %s\n",nt,inventory[0]);
         else
-            fprintf(stderr,"%d: no convergence\n",nt);
+            fprintf(stderr,"%d: no convergence\n",nt);*/
     
     } else{ //speaker
         // Set the LED red.

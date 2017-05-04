@@ -6,7 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="0"
+    <experiment length="1000"
                 ticks_per_second="10"
                 random_seed="124" />
   </framework>
@@ -87,12 +87,12 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>
+  <!--visualization>
     <qt-opengl>
       <camera>
         <placement idx="0" position="0,0,0.5" look_at="0,0,0" lens_focal_length="13" />
       </camera>
     </qt-opengl>
-  </visualization>
+  </visualization-->
 
 </argos-configuration>

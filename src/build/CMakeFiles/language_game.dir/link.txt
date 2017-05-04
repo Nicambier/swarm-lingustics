@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC   -shared -Wl,-soname,liblanguage_game.so -o liblanguage_game.so CMakeFiles/language_game.dir/language_game.cpp.o  -L/usr/local/lib/argos3 -largos3core_simulator -llua5.2 -lm -largos3plugin_simulator_entities -Wl,-rpath,/usr/local/lib/argos3 
