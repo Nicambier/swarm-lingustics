@@ -10,13 +10,29 @@
 #include <argos3/plugins/robots/generic/control_interface/ci_differential_steering_actuator.h>
 /* Definition of the foot-bot proximity sensor */
 #include <argos3/plugins/robots/foot-bot/control_interface/ci_footbot_proximity_sensor.h>
+/* Definition of the range and bearing actuator */
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_actuator.h>
+/* Definition of the range and bearing sensor */
+#include <argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h>
+/* Definitions for random number generation */
+#include <argos3/core/utility/math/rng.h>
+
+#include <string>
+
+
+#define MAX_TURNS 10*round(2*3.14*14/(2*m_fWheelVelocity))
+#define STATE_WALK 0
+#define STATE_STAY 1
+#define STATE_LEAVE 2
+#define STATE_AVOID 3
+
 
 /*
  * All the ARGoS stuff in the 'argos' namespace.
  * With this statement, you save typing argos:: every time.
  */
 using namespace argos;
-
+using namespace std;
 /*
  * A controller is simply an implementation of the CCI_Controller class.
  */
@@ -42,6 +58,18 @@ public:
     * The length of the time step is set in the XML file.
     */
    virtual void ControlStep();
+   
+   virtual void Move();
+   
+   virtual void ChangeState(unsigned short int newState);
+   
+   virtual void Walk();
+   
+   virtual void Stay();
+   
+   virtual void Leave();
+   
+   virtual string GetWord();
 
    /*
     * This function resets the controller to its state right after the
@@ -51,7 +79,7 @@ public:
     * so the function could have been omitted. It's here just for
     * completeness.
     */
-   virtual void Reset() {}
+   virtual void Reset();
 
    /*
     * Called to cleanup what done by Init() when the experiment finishes.
@@ -67,6 +95,17 @@ private:
    CCI_DifferentialSteeringActuator* m_pcWheels;
    /* Pointer to the foot-bot proximity sensor */
    CCI_FootBotProximitySensor* m_pcProximity;
+   /* Pointer to the range and bearing actuator */
+   CCI_RangeAndBearingActuator*  m_pcRABA;
+   /* Pointer to the range and bearing sensor */
+   CCI_RangeAndBearingSensor* m_pcRABS;
+   
+   short int avoidTurns;
+   short int leaveTurns;
+   short int stayTurns;
+   unsigned short int state;
+   /* The random number generator */
+   CRandom::CRNG* m_pcRNG;
 
    /*
     * The following variables are used as parameters for the
@@ -88,6 +127,12 @@ private:
    Real m_fDelta;
    /* Wheel speed. */
    Real m_fWheelVelocity;
+   
+   /* Base staying proba */
+   Real m_fBaseProba;
+   unsigned int m_fStayTurns;
+   unsigned int m_fLeaveTurns;
+   
    /* Angle tolerance range to go straight.
     * It is set to [-alpha,alpha]. */
    CRange<CRadians> m_cGoStraightAngleRange;
