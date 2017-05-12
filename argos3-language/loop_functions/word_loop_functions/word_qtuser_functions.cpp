@@ -17,7 +17,7 @@ void CWORDQTUserFunctions::Draw(CFootBotEntity& c_entity) {
     * $ argos3 -q foot-bot
     */
    DrawText(CVector3(0.15, 0.15, 0.1),   // position
-            c_entity.GetId().c_str()); // text
+            (static_cast<CFootBotAggregation&>(c_entity.GetControllableEntity().GetController())).GetState().c_str()); // text
 }
 
 /****************************************/

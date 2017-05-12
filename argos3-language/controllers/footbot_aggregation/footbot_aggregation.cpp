@@ -145,17 +145,16 @@ void CFootBotAggregation::ChangeState(unsigned short int newState) {
             break;
         case STATE_STAY:
             m_pcWheels->SetLinearVelocity(0, 0);
-            stayTurns = 50;
+            stayTurns = m_fStayTurns;
             break;
         case STATE_LEAVE:
             m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
-            leaveTurns = 50;
+            leaveTurns = m_fLeaveTurns;
             break;
     }
 }
-            
 
-void CFootBotAggregation::Walk() {
+unsigned int CFootBotAggregation::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
     unsigned int counter = 1;
     for(size_t i = 0; i < tPackets.size(); ++i) {
@@ -165,8 +164,13 @@ void CFootBotAggregation::Walk() {
                 break;
         }
     }
-    
-    float p = counter*m_fBaseProba;
+    return counter;
+}
+            
+
+void CFootBotAggregation::Walk() {
+    float p = CountNeighbours()*m_fBaseProba;
+    cout<<p;
     if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
         ChangeState(STATE_STAY);
     else
@@ -175,19 +179,8 @@ void CFootBotAggregation::Walk() {
 
 void CFootBotAggregation::Stay() {
     --stayTurns;
-    if(stayTurns == 0) {
-        const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-        unsigned int counter = 1;
-        for(size_t i = 0; i < tPackets.size(); ++i) {
-            switch(tPackets[i].Data[0]) {
-                case STATE_STAY: {
-                    ++counter;
-                break;
-                }
-            }
-        }
-        
-        float p = counter*m_fBaseProba;
+    if(stayTurns == 0) {        
+        float p = CountNeighbours()*m_fBaseProba;
         if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
             ChangeState(STATE_STAY);
         else
@@ -204,7 +197,7 @@ void CFootBotAggregation::Leave() {
         Move();    
 }
 
-string CFootBotAggregation::GetWord() {
+string CFootBotAggregation::GetState() {
     switch(state) {
         case STATE_WALK:
             return "WALK";

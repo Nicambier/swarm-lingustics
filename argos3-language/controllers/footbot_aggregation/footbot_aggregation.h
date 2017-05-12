@@ -63,13 +63,15 @@ public:
    
    virtual void ChangeState(unsigned short int newState);
    
+   virtual unsigned int CountNeighbours();
+   
    virtual void Walk();
    
    virtual void Stay();
    
    virtual void Leave();
    
-   virtual string GetWord();
+   virtual string GetState();
 
    /*
     * This function resets the controller to its state right after the
@@ -89,7 +91,7 @@ public:
     */
    virtual void Destroy() {}
 
-private:
+protected:
 
    /* Pointer to the differential steering actuator */
    CCI_DifferentialSteeringActuator* m_pcWheels;

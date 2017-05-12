@@ -7,8 +7,7 @@
   <framework>
     <system threads="0" />
     <experiment length="0"
-                ticks_per_second="10"
-                random_seed="124" />
+                ticks_per_second="10"/>
   </framework>
 
   <!-- *************** -->
@@ -26,7 +25,7 @@
         <footbot_proximity implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
-      <params alpha="90" delta="0.1" velocity="10" baseProba="0.14" leaveTurns="50" stayTurns="50" />
+      <params alpha="90" delta="0.5" velocity="10" baseProba="0.14" leaveTurns="50" stayTurns="200" />
     </footbot_aggregation_controller>
 
   </controllers>
@@ -53,7 +52,7 @@
     <distribute>
       <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="50" max_trials="100"> 
+      <entity quantity="100" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="fdc" />
