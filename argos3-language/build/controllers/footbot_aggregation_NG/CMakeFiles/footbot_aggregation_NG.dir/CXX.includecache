@@ -6,14 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation/footbot_aggregation.cpp
-footbot_aggregation.h
-/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation/footbot_aggregation.h
-argos3/core/utility/configuration/argos_configuration.h
--
-argos3/core/utility/math/vector2.h
--
-
 /home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation/footbot_aggregation.h
 argos3/core/control_interface/ci_controller.h
 -
@@ -28,6 +20,20 @@ argos3/plugins/robots/generic/control_interface/ci_range_and_bearing_sensor.h
 argos3/core/utility/math/rng.h
 -
 string
+-
+
+/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation_NG/footbot_aggregation_NG.cpp
+footbot_aggregation_NG.h
+/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation_NG/footbot_aggregation_NG.h
+
+/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation_NG/footbot_aggregation_NG.h
+../footbot_aggregation/footbot_aggregation.h
+/home/nicolas/Documents/swarm-lingustics/argos3-language/controllers/footbot_aggregation/footbot_aggregation.h
+sstream
+-
+string
+-
+vector
 -
 
 /usr/include/lua5.2/lauxlib.h

@@ -124,6 +124,19 @@ footbot_aggregation/fast:
 .PHONY : footbot_aggregation/fast
 
 #=============================================================================
+# Target rules for targets named footbot_aggregation_NG
+
+# Build rule for target.
+footbot_aggregation_NG: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 footbot_aggregation_NG
+.PHONY : footbot_aggregation_NG
+
+# fast build rule for target.
+footbot_aggregation_NG/fast:
+	$(MAKE) -f controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build.make controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build
+.PHONY : footbot_aggregation_NG/fast
+
+#=============================================================================
 # Target rules for targets named word_loop_functions
 
 # Build rule for target.
@@ -145,6 +158,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... footbot_aggregation"
+	@echo "... footbot_aggregation_NG"
 	@echo "... word_loop_functions"
 .PHONY : help
 

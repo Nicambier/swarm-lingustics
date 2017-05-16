@@ -64,16 +64,19 @@ CMAKE_BINARY_DIR = /home/nicolas/Documents/swarm-lingustics/argos3-language/buil
 
 # Convenience name for "all" pass in the directory.
 controllers/all: controllers/footbot_aggregation/all
+controllers/all: controllers/footbot_aggregation_NG/all
 
 .PHONY : controllers/all
 
 # Convenience name for "clean" pass in the directory.
 controllers/clean: controllers/footbot_aggregation/clean
+controllers/clean: controllers/footbot_aggregation_NG/clean
 
 .PHONY : controllers/clean
 
 # Convenience name for "preinstall" pass in the directory.
 controllers/preinstall: controllers/footbot_aggregation/preinstall
+controllers/preinstall: controllers/footbot_aggregation_NG/preinstall
 
 .PHONY : controllers/preinstall
 
@@ -133,6 +136,61 @@ clean: controllers/footbot_aggregation/CMakeFiles/footbot_aggregation.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Directory level rules for directory controllers/footbot_aggregation_NG
+
+# Convenience name for "all" pass in the directory.
+controllers/footbot_aggregation_NG/all: controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/all
+
+.PHONY : controllers/footbot_aggregation_NG/all
+
+# Convenience name for "clean" pass in the directory.
+controllers/footbot_aggregation_NG/clean: controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/clean
+
+.PHONY : controllers/footbot_aggregation_NG/clean
+
+# Convenience name for "preinstall" pass in the directory.
+controllers/footbot_aggregation_NG/preinstall:
+
+.PHONY : controllers/footbot_aggregation_NG/preinstall
+
+#=============================================================================
+# Target rules for target controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir
+
+# All Build rule for target.
+controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/all: controllers/footbot_aggregation/CMakeFiles/footbot_aggregation.dir/all
+	$(MAKE) -f controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build.make controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/depend
+	$(MAKE) -f controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build.make controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicolas/Documents/swarm-lingustics/argos3-language/build/CMakeFiles --progress-num=3,4 "Built target footbot_aggregation_NG"
+.PHONY : controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/all
+
+# Include target in all.
+all: controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicolas/Documents/swarm-lingustics/argos3-language/build/CMakeFiles 4
+	$(MAKE) -f CMakeFiles/Makefile2 controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/nicolas/Documents/swarm-lingustics/argos3-language/build/CMakeFiles 0
+.PHONY : controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/rule
+
+# Convenience name for target.
+footbot_aggregation_NG: controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/rule
+
+.PHONY : footbot_aggregation_NG
+
+# clean rule for target.
+controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/clean:
+	$(MAKE) -f controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/build.make controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/clean
+.PHONY : controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/clean
+
+# clean rule for target.
+clean: controllers/footbot_aggregation_NG/CMakeFiles/footbot_aggregation_NG.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Directory level rules for directory loop_functions
 
 # Convenience name for "all" pass in the directory.
@@ -175,7 +233,7 @@ loop_functions/word_loop_functions/preinstall:
 loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/all:
 	$(MAKE) -f loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/build.make loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/depend
 	$(MAKE) -f loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/build.make loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicolas/Documents/swarm-lingustics/argos3-language/build/CMakeFiles --progress-num=3,4 "Built target word_loop_functions"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/nicolas/Documents/swarm-lingustics/argos3-language/build/CMakeFiles --progress-num=5,6 "Built target word_loop_functions"
 .PHONY : loop_functions/word_loop_functions/CMakeFiles/word_loop_functions.dir/all
 
 # Include target in all.

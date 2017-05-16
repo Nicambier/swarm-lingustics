@@ -823,6 +823,9 @@ argos3_examples_SOURCE_DIR:STATIC=/home/nicolas/Documents/swarm-lingustics/argos
 footbot_aggregation_LIB_DEPENDS:STATIC=general;argos3core_simulator;general;argos3plugin_simulator_footbot;general;argos3plugin_simulator_genericrobot;
 
 //Dependencies for the target
+footbot_aggregation_NG_LIB_DEPENDS:STATIC=general;footbot_aggregation;general;argos3core_simulator;general;argos3plugin_simulator_footbot;general;argos3plugin_simulator_genericrobot;
+
+//Dependencies for the target
 word_loop_functions_LIB_DEPENDS:STATIC=general;argos3core_simulator;general;argos3plugin_simulator_entities;general;argos3plugin_simulator_footbot;general;argos3plugin_simulator_qtopengl;
 
 
@@ -950,7 +953,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
