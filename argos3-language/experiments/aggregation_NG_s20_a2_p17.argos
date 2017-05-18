@@ -6,14 +6,14 @@
   <!-- ************************* -->
   <framework>
     <system threads="8" />
-    <experiment length="0"
+    <experiment length="100000"
                 ticks_per_second="10"/>
   </framework>
   
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" />
+  <loop_functions library="../../../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="s20_a2_p17.txt" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -21,7 +21,7 @@
   <controllers>
 
     <footbot_aggregation_NG_controller id="fdc"
-                                  library="build/controllers/footbot_aggregation_NG/libfootbot_aggregation_NG.so">
+                                  library="../../../build/controllers/footbot_aggregation_NG/libfootbot_aggregation_NG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
@@ -30,7 +30,7 @@
         <footbot_proximity implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
-      <params alpha="90" delta="0.5" velocity="10" baseProba="0.2" leaveTurns="50" stayTurns="200" walkTurns="1" rule="1" />
+      <params alpha="90" delta="0.5" velocity="10" baseProba="0.17" leaveTurns="50" stayTurns="200" walkTurns="1" rule="1" />
     </footbot_aggregation_NG_controller>
 
   </controllers>
@@ -38,24 +38,24 @@
    <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="6, 7.5, 1" center="0,0,0.5">
+  <arena size="12, 15, 1" center="0,0,0.5">
       <!--floor id="g" source="image" path="plain.png" /> <!--Can't delete that because of the getFloorColour() function in the c file-->
 
-    <box id="bn" size="0.1, 7.5, 0.2" movable="false">
-      <body position="3,0,0"  orientation="0,0,0" />
+    <box id="bn" size="0.1, 15, 0.2" movable="false">
+      <body position="6,0,0"  orientation="0,0,0" />
     </box>
-    <box id="bs" size="0.1, 7.5, 0.2" movable="false">
-      <body position="-3,0,0" orientation="0,0,0" />
+    <box id="bs" size="0.1, 15, 0.2" movable="false">
+      <body position="-6,0,0" orientation="0,0,0" />
     </box>
-    <box id="be" size="6, 0.1, 0.2" movable="false">
-      <body position="0,-3.75,0" orientation="0,0,0" />
+    <box id="be" size="12, 0.1, 0.2" movable="false">
+      <body position="0,-7.5,0" orientation="0,0,0" />
     </box>
-    <box id="bw" size="6, 0.1, 0.2" movable="false">
-      <body position="0,3.75,0" orientation="0,0,0" />
+    <box id="bw" size="12, 0.1, 0.2" movable="false">
+      <body position="0,7.5,0" orientation="0,0,0" />
     </box>
 
     <distribute>
-      <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
+      <position method="uniform" min="-6,-7.5,0" max="6,7.5,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
       <entity quantity="20" max_trials="100"> 
         <foot-bot id="fb" 
@@ -84,17 +84,5 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <visualization>      
-    <qt-opengl lua_editor="false">
-      <user_functions library="build/loop_functions/word_loop_functions/libword_loop_functions"
-                      label="word_qtuser_functions" />
-      <camera>
-        <placement idx="0" position="-0.00569879,0.01,4.86243" look_at="-0.00569879,0.01,3.86243" lens_focal_length="20" />
-        <placement idx="1" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
-        <placement idx="2" position="0.884183,0.359128,0.490269" look_at="0.924486,-0.486744,-0.0415919" lens_focal_length="20" />
-      </camera>
-    </qt-opengl>
-
-  </visualization>
 
 </argos-configuration>

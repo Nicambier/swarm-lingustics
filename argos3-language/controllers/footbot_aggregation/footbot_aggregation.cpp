@@ -17,12 +17,16 @@ CFootBotAggregation::CFootBotAggregation() :
    m_fBaseProba(0.14f),
    m_fStayTurns(50),
    m_fLeaveTurns(50),
+   m_fWalkTurns(50),
    m_pcRABA(NULL),
    m_pcRABS(NULL),
    m_pcRNG(NULL),
    avoidTurns(0), 
    stayTurns(0),
    leaveTurns(0),
+   walkTurns(1),
+   probaRule(1),
+   lastMove(0),
    m_cGoStraightAngleRange(-ToRadians(m_cAlpha),
                            ToRadians(m_cAlpha)) {}
    
@@ -60,10 +64,6 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
    m_pcRABS      = GetSensor  <CCI_RangeAndBearingSensor       >("range_and_bearing"    );
    /*
     * Parse the configuration file
-    *
-    * The user defines this part. Here, the algorithm accepts three
-    * parameters and it's nice to put them in the config file so we don't
-    * have to recompile if we want to try other settings.
     */
    GetNodeAttributeOrDefault(t_node, "alpha", m_cAlpha, m_cAlpha);
    m_cGoStraightAngleRange.Set(-ToRadians(m_cAlpha), ToRadians(m_cAlpha));
@@ -72,6 +72,8 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
    GetNodeAttributeOrDefault(t_node, "baseProba", m_fBaseProba, m_fBaseProba);
    GetNodeAttributeOrDefault(t_node, "leaveTurns", m_fLeaveTurns, m_fLeaveTurns);
    GetNodeAttributeOrDefault(t_node, "stayTurns", m_fStayTurns, m_fStayTurns);
+   GetNodeAttributeOrDefault(t_node, "walkTurns", m_fWalkTurns, m_fWalkTurns);
+   GetNodeAttributeOrDefault(t_node, "rule", probaRule, probaRule);
    
    /* Create a random number generator. We use the 'argos' category so
       that creation, reset, seeding and cleanup are managed by ARGoS. */
@@ -81,9 +83,11 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
 
 void CFootBotAggregation::Reset() {
     state = STATE_WALK;
+    lastMove = 0;
     avoidTurns = 0;
     leaveTurns = 0;
     stayTurns = 0;
+    walkTurns = 1;
     m_pcRABA->ClearData();
     m_pcRABA->SetData(0, state);
 }
@@ -92,6 +96,7 @@ void CFootBotAggregation::Reset() {
 /****************************************/
 
 void CFootBotAggregation::ControlStep() {
+    ++lastMove;
     if(!avoidTurns) {
         switch(state) {
             case STATE_WALK:
@@ -129,11 +134,11 @@ void CFootBotAggregation::Move() {
     
     if(obstacle) {
         m_pcWheels->SetLinearVelocity(-m_fWheelVelocity, m_fWheelVelocity);
-        avoidTurns = m_pcRNG->Uniform(CRange<UInt32>(0,MAX_TURNS));
+        avoidTurns = m_pcRNG->Uniform(CRange<UInt32>(0.25*COMPLETE_TURN,0.75*COMPLETE_TURN));
     } else {
         m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
     }
-    
+    lastMove = 0;
 }
 
 void CFootBotAggregation::ChangeState(unsigned short int newState) {
@@ -142,6 +147,7 @@ void CFootBotAggregation::ChangeState(unsigned short int newState) {
     switch(newState) {
         case STATE_WALK:
             m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
+            walkTurns = m_fWalkTurns;
             break;
         case STATE_STAY:
             m_pcWheels->SetLinearVelocity(0, 0);
@@ -166,21 +172,37 @@ unsigned int CFootBotAggregation::CountNeighbours() {
     }
     return counter;
 }
-            
+
+float CFootBotAggregation::ComputeProba(unsigned int n) {
+    switch(probaRule) {
+        case 1: //linear
+            return n*m_fBaseProba;
+        case 2: //log
+            return 1-((1-m_fBaseProba)/n);
+        case 3: //garnier
+            float p[4] = {0,0.42,0.5,0.1};
+            if(n>3)
+                n=3;
+            return p[n];
+    }
+}
 
 void CFootBotAggregation::Walk() {
-    float p = CountNeighbours()*m_fBaseProba;
-    cout<<p;
-    if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
-        ChangeState(STATE_STAY);
-    else
+    --walkTurns;
+    if(walkTurns == 0) {
+        float p = ComputeProba(CountNeighbours());
+        if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
+            ChangeState(STATE_STAY);
+        else
+            ChangeState(STATE_WALK);
+    } else if(state==STATE_WALK)
         Move();
 }
 
 void CFootBotAggregation::Stay() {
     --stayTurns;
     if(stayTurns == 0) {        
-        float p = CountNeighbours()*m_fBaseProba;
+        float p = ComputeProba(CountNeighbours());
         if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
             ChangeState(STATE_STAY);
         else
@@ -209,6 +231,10 @@ string CFootBotAggregation::GetState() {
             return "LEAVE";
             break;
     }
+}
+
+int CFootBotAggregation::LastMove() {
+    return lastMove;
 }
 
 /****************************************/

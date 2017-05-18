@@ -20,11 +20,13 @@
 #include <string>
 
 
-#define MAX_TURNS 10*round(2*3.14*14/(2*m_fWheelVelocity))
+#define COMPLETE_TURN 10*round(2*3.14*14/(2*m_fWheelVelocity))
 #define STATE_WALK 0
 #define STATE_STAY 1
 #define STATE_LEAVE 2
 #define STATE_AVOID 3
+
+
 
 
 /*
@@ -65,6 +67,8 @@ public:
    
    virtual unsigned int CountNeighbours();
    
+   virtual float ComputeProba(unsigned int n);
+   
    virtual void Walk();
    
    virtual void Stay();
@@ -72,6 +76,8 @@ public:
    virtual void Leave();
    
    virtual string GetState();
+   
+   virtual int LastMove();
 
    /*
     * This function resets the controller to its state right after the
@@ -89,7 +95,7 @@ public:
     * so the function could have been omitted. It's here just for
     * completeness.
     */
-   virtual void Destroy() {}
+   virtual void Destroy() {}    
 
 protected:
 
@@ -102,10 +108,15 @@ protected:
    /* Pointer to the range and bearing sensor */
    CCI_RangeAndBearingSensor* m_pcRABS;
    
-   short int avoidTurns;
-   short int leaveTurns;
-   short int stayTurns;
+   int lastMove;
+   
+   int avoidTurns;
+   int leaveTurns;
+   int stayTurns;
+   int walkTurns;
    unsigned short int state;
+   
+   unsigned short int probaRule;
    /* The random number generator */
    CRandom::CRNG* m_pcRNG;
 
@@ -134,6 +145,7 @@ protected:
    Real m_fBaseProba;
    unsigned int m_fStayTurns;
    unsigned int m_fLeaveTurns;
+   unsigned int m_fWalkTurns;
    
    /* Angle tolerance range to go straight.
     * It is set to [-alpha,alpha]. */

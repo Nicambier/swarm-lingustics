@@ -86,7 +86,7 @@ void CFootBotAggregation_NG::Stay() {
 }
 
 string CFootBotAggregation_NG::GetState() {
-    string word = "";
+    string word = "N/A";
     
     if(lexicon.size()==1) {
         ostringstream temp;
@@ -94,7 +94,7 @@ string CFootBotAggregation_NG::GetState() {
         word = temp.str();
     }
     
-    return CFootBotAggregation::GetState() + " " + word;
+    return word;
 }
 
 /****************************************/
