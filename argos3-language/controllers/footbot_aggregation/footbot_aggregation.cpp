@@ -220,7 +220,7 @@ void CFootBotAggregation::Leave() {
 }
 
 string CFootBotAggregation::GetState() {
-    switch(state) {
+    /*switch(state) {
         case STATE_WALK:
             return "WALK";
             break;
@@ -230,7 +230,8 @@ string CFootBotAggregation::GetState() {
         case STATE_LEAVE:
             return "LEAVE";
             break;
-    }
+    }*/
+    return "0";
 }
 
 int CFootBotAggregation::LastMove() {
