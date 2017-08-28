@@ -18,7 +18,7 @@ int clusterSize(list< pair<float,float> >::iterator seed, list< pair<float,float
         while(hasNeighbours) {
             hasNeighbours = false;
             for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
-                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < 0.9) {
+                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < 1) {
                     hasNeighbours = true;
                     size += clusterSize(it,pos);
                     break;
