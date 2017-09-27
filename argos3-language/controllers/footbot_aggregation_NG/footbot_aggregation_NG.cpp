@@ -28,30 +28,39 @@ void CFootBotAggregation_NG::Reset() {
 void CFootBotAggregation_NG::ChangeState(unsigned short int newState) {
     CFootBotAggregation::ChangeState(newState);
     switch(newState) {
-        case STATE_WALK:
-            m_pcRABA->SetData(0, 0);
-            break;
+//         case STATE_WALK:
+//             speak(false);
+//             break;
         case STATE_STAY:
-            if(lexicon.size()==0)
-                currentWord = m_pcRNG->Uniform(CRange<UInt32>(1,256));
-            else
-                currentWord = lexicon[m_pcRNG->Uniform(CRange<UInt32>(0,lexicon.size()))];
-            m_pcRABA->SetData(0, currentWord);
+            speak(true);
             break;
         case STATE_LEAVE:
-            m_pcRABA->SetData(0, 0);
+            speak(false);
             break;
     }
 }
 
-bool CFootBotAggregation_NG::UpdateLexicon(unsigned short int w) {
+void CFootBotAggregation_NG::speak(bool activate) {
+    if(activate) {
+        if(lexicon.size()==0)
+            currentWord = m_pcRNG->Uniform(CRange<UInt32>(1,256));
+        else
+            currentWord = lexicon[m_pcRNG->Uniform(CRange<UInt32>(0,lexicon.size()))];
+        m_pcRABA->SetData(0, currentWord);
+    } else
+        m_pcRABA->SetData(0, 0);
+}
+
+bool CFootBotAggregation_NG::hear(unsigned short int w) {
     bool inside = false;
 
     if(w > 0) {
-        for (vector<unsigned short int>::iterator it = lexicon.begin() ; it != lexicon.end(); ++it) {
+        for (vector<unsigned short int>::iterator it = lexicon.begin() ; it != lexicon.end() && !inside; ++it) {
+            cout<<w<<" "<<*it<<" ";
             if(w == *it) {
                 inside = true;
             }
+            cout<<inside<<endl;
         }
                 
         if(inside) {
@@ -72,7 +81,7 @@ unsigned int CFootBotAggregation_NG::CountNeighbours() {
     unsigned int counter = 1;
     for(size_t i = 0; i < tPackets.size(); ++i) {
         if(tPackets[i].Range < 100) {
-            if(UpdateLexicon(tPackets[i].Data[0]))
+            if(hear(tPackets[i].Data[0]))
                 ++counter;
             else
                 counter = 1;
@@ -82,10 +91,10 @@ unsigned int CFootBotAggregation_NG::CountNeighbours() {
     return counter;
 }
 
-void CFootBotAggregation_NG::Stay() {
-    m_pcRABA->SetData(0, currentWord);
-    CFootBotAggregation::Stay();
-}
+// void CFootBotAggregation_NG::Stay() {
+//     //m_pcRABA->SetData(0, currentWord); //uncomment if bots behave weirdly... but I don't know why it's there...
+//     CFootBotAggregation::Stay();
+// }
 
 string CFootBotAggregation_NG::GetState() {
     string word = "N/A";
@@ -96,7 +105,7 @@ string CFootBotAggregation_NG::GetState() {
         word = temp.str();
     }
     
-    return word;
+    return CFootBotAggregation::GetState()+" "+word;
 }
 
 /****************************************/

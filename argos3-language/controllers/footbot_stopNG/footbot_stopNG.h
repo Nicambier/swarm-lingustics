@@ -1,7 +1,7 @@
-#ifndef FOOTBOT_AGGREGATION_NG_H
-#define FOOTBOT_AGGREGATION_NG_H
+#ifndef FOOTBOT_STOPNG_H
+#define FOOTBOT_STOPNG_H
 
-#include "../footbot_aggregation/footbot_aggregation.h"
+#include "../footbot_aggregation_NG/footbot_aggregation_NG.h"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -14,15 +14,15 @@
 using namespace argos;
 using namespace std;
 
-class CFootBotAggregation_NG : public CFootBotAggregation {
+class CFootBotStopNG : public CFootBotAggregation_NG {
 
 public:
 
    /* Class constructor. */
-   CFootBotAggregation_NG();
+   CFootBotStopNG();
 
    /* Class destructor. */
-   virtual ~CFootBotAggregation_NG() {}
+   virtual ~CFootBotStopNG() {}
 
    /*
     * This function initializes the controller.
@@ -35,22 +35,7 @@ public:
    
    virtual unsigned int CountNeighbours();
    
-   virtual void speak(bool activate);
-   virtual bool hear(unsigned short int w);
-   
-   //virtual void Stay();
-   
-   virtual string GetState();
-
-   /*
-    * This function resets the controller to its state right after the
-    * Init().
-    * It is called when you press the reset button in the GUI.
-    * In this example controller there is no need for resetting anything,
-    * so the function could have been omitted. It's here just for
-    * completeness.
-    */
-   virtual void Reset();
+   virtual float ComputeProba(unsigned int n);
 
    /*
     * Called to cleanup what done by Init() when the experiment finishes.
@@ -63,6 +48,9 @@ public:
 private:
     unsigned short int currentWord;
     vector<unsigned short int> lexicon;
+    
+    bool success;
+    bool empty;
 
 
 };

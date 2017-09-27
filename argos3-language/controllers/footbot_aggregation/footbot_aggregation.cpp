@@ -82,14 +82,13 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
 }
 
 void CFootBotAggregation::Reset() {
-    state = STATE_WALK;
     lastMove = 0;
     avoidTurns = 0;
     leaveTurns = 0;
     stayTurns = 0;
     walkTurns = 1;
     m_pcRABA->ClearData();
-    m_pcRABA->SetData(0, state);
+    ChangeState(STATE_WALK);
 }
 
 /****************************************/
@@ -121,7 +120,6 @@ void CFootBotAggregation::Move() {
         /* Get readings from proximity sensor */
     const CCI_FootBotProximitySensor::TReadings& tProxReads = m_pcProximity->GetReadings();
 
-        float thresh = 0.4;
         bool obstacle = false;
     // Check obstacles in the [-pi/2,pi/2] range
     for(size_t i = 0; i < tProxReads.size(); ++i) {
@@ -146,7 +144,7 @@ void CFootBotAggregation::ChangeState(unsigned short int newState) {
     m_pcRABA->SetData(0, newState);
     switch(newState) {
         case STATE_WALK:
-            m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
+            Move();
             walkTurns = m_fWalkTurns;
             break;
         case STATE_STAY:
@@ -154,7 +152,7 @@ void CFootBotAggregation::ChangeState(unsigned short int newState) {
             stayTurns = m_fStayTurns;
             break;
         case STATE_LEAVE:
-            m_pcWheels->SetLinearVelocity(m_fWheelVelocity, m_fWheelVelocity);
+            Move();
             leaveTurns = m_fLeaveTurns;
             break;
     }
@@ -172,6 +170,7 @@ unsigned int CFootBotAggregation::CountNeighbours() {
             }
         }
     }
+    
     return counter;
 }
 
@@ -181,11 +180,20 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
             return n*m_fBaseProba;
         case 2: //log
             return 1-((1-m_fBaseProba)/n);
-        case 3: //garnier
-            float p[4] = {0,0.42,0.5,0.1};
-            if(n>3)
-                n=3;
-            return p[n];
+        case 3: //correll and martinolli
+            --n; //don't count the bot itself
+            float pJoin[5] = {0.03,0.42,0.5,0.51,0.51};
+            float pLeave[5] = {1,1.0/49,1.0/424,1.0/700,1.0/1306};
+            if(n>4)
+                n=4;
+            switch(state) {
+                case STATE_WALK:
+                    return pJoin[n];
+                    break;
+                case STATE_STAY:
+                    return 1-pLeave[n];
+                    break;
+            }
     }
 }
 
@@ -222,7 +230,7 @@ void CFootBotAggregation::Leave() {
 }
 
 string CFootBotAggregation::GetState() {
-    /*switch(state) {
+    switch(state) {
         case STATE_WALK:
             return "WALK";
             break;
@@ -232,8 +240,8 @@ string CFootBotAggregation::GetState() {
         case STATE_LEAVE:
             return "LEAVE";
             break;
-    }*/
-    return "0";
+    }
+    //return "0";
 }
 
 int CFootBotAggregation::LastMove() {
