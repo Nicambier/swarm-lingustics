@@ -18,6 +18,7 @@
 #include <argos3/core/utility/math/rng.h>
 
 #include <string>
+#include <math.h>
 
 
 #define COMPLETE_TURN 10*round(2*3.14*14/(2*m_fWheelVelocity))
@@ -142,10 +143,8 @@ protected:
    Real m_fWheelVelocity;
    
    /* Base staying proba */
-   Real m_fBaseProba;
-   unsigned int m_fStayTurns;
-   unsigned int m_fLeaveTurns;
-   unsigned int m_fWalkTurns;
+   Real a,b,c;
+   unsigned int minDist,m_fStayTurns,m_fLeaveTurns,m_fWalkTurns;
    
    /* Angle tolerance range to go straight.
     * It is set to [-alpha,alpha]. */

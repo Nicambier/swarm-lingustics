@@ -80,7 +80,7 @@ unsigned int CFootBotAggregation_NG::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
     unsigned int counter = 1;
     for(size_t i = 0; i < tPackets.size(); ++i) {
-        if(tPackets[i].Range < 100) {
+        if(tPackets[i].Range < minDist) {
             if(hear(tPackets[i].Data[0]))
                 ++counter;
             else

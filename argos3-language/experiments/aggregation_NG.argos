@@ -5,7 +5,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="8" />
+    <system threads="3" />
     <experiment length="0"
                 ticks_per_second="10"/>
   </framework>
@@ -20,8 +20,8 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_aggregation_NG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_NG/libfootbot_aggregation_NG.so">
+    <footbot_stopNG_controller id="fdc"
+                                  library="../build/controllers/footbot_stopNG/libfootbot_stopNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
@@ -30,8 +30,8 @@
         <footbot_proximity implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
-      <params alpha="90" delta="0.5" velocity="10" baseProba="0.25" leaveTurns="50" stayTurns="200" walkTurns="1" rule="1" />
-    </footbot_aggregation_NG_controller>
+      <params alpha="90" delta="0.5" velocity="10" baseProba="0.20" leaveTurns="50" stayTurns="200" walkTurns="1" rule="1" />
+    </footbot_stopNG_controller>
 
   </controllers>
 
@@ -56,7 +56,7 @@
     <distribute>
       <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="100" max_trials="100"> 
+      <entity quantity="20" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="fdc" />

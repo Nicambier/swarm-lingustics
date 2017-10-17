@@ -46,7 +46,7 @@ unsigned int CFootBotStopNG::CountNeighbours() {
     bool success = true;
     bool empty = true;
     for(size_t i = 0; i < tPackets.size(); ++i) {
-        if(tPackets[i].Range < 100) {
+        if(tPackets[i].Range < minDist) {
             empty = false;
             if(!hear(tPackets[i].Data[0]))
                 success = false;

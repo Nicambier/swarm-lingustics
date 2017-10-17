@@ -14,7 +14,10 @@ CFootBotAggregation::CFootBotAggregation() :
    m_cAlpha(90.0f),
    m_fDelta(0.5f),
    m_fWheelVelocity(2.5f),
-   m_fBaseProba(0.14f),
+   minDist(1),
+   a(0.14f),
+   b(0),
+   c(0),
    m_fStayTurns(50),
    m_fLeaveTurns(50),
    m_fWalkTurns(50),
@@ -65,11 +68,14 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
    /*
     * Parse the configuration file
     */
-   GetNodeAttributeOrDefault(t_node, "alpha", m_cAlpha, m_cAlpha);
+   m_cAlpha = CDegrees(90.0f);
    m_cGoStraightAngleRange.Set(-ToRadians(m_cAlpha), ToRadians(m_cAlpha));
-   GetNodeAttributeOrDefault(t_node, "delta", m_fDelta, m_fDelta);
-   GetNodeAttributeOrDefault(t_node, "velocity", m_fWheelVelocity, m_fWheelVelocity);
-   GetNodeAttributeOrDefault(t_node, "baseProba", m_fBaseProba, m_fBaseProba);
+   m_fDelta = 0.5;
+   m_fWheelVelocity = 10;
+   GetNodeAttributeOrDefault(t_node, "minDist", minDist, minDist);
+   GetNodeAttributeOrDefault(t_node, "a", a, a);
+   GetNodeAttributeOrDefault(t_node, "b", b, b);
+   GetNodeAttributeOrDefault(t_node, "c", c, c);
    GetNodeAttributeOrDefault(t_node, "leaveTurns", m_fLeaveTurns, m_fLeaveTurns);
    GetNodeAttributeOrDefault(t_node, "stayTurns", m_fStayTurns, m_fStayTurns);
    GetNodeAttributeOrDefault(t_node, "walkTurns", m_fWalkTurns, m_fWalkTurns);
@@ -140,8 +146,14 @@ void CFootBotAggregation::Move() {
 }
 
 void CFootBotAggregation::ChangeState(unsigned short int newState) {
+    if(probaRule==2) {
+        //m_pcRABA->SetData(0, STATE_STAY);
+        if(newState==STATE_LEAVE)
+            newState = STATE_WALK;
+    }
+    //else
+        m_pcRABA->SetData(0, newState);
     state = newState;
-    m_pcRABA->SetData(0, newState);
     switch(newState) {
         case STATE_WALK:
             Move();
@@ -162,12 +174,8 @@ unsigned int CFootBotAggregation::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
     unsigned int counter = 1;
     for(size_t i = 0; i < tPackets.size(); ++i) {
-        if(tPackets[i].Range < 100) {
-            switch(tPackets[i].Data[0]) {
-                case STATE_STAY:
-                    ++counter;
-                    break;
-            }
+        if(tPackets[i].Range < minDist and tPackets[i].Data[0] == STATE_STAY) {
+            ++counter;
         }
     }
     
@@ -177,13 +185,23 @@ unsigned int CFootBotAggregation::CountNeighbours() {
 float CFootBotAggregation::ComputeProba(unsigned int n) {
     switch(probaRule) {
         case 1: //linear
-            return n*m_fBaseProba;
-        case 2: //log
-            return 1-((1-m_fBaseProba)/n);
+            return n*a;
+            break;
+        case 2: //functions
+            --n;
+            switch(state) {
+                case STATE_WALK: //P_join
+                    return 0.03+0.48*(1-exp(-a*n));
+                    break;
+                case STATE_STAY: //1-P_leave
+                    return 1-exp(-c*n);
+                    break;
+            }
+            break;
         case 3: //correll and martinolli
             --n; //don't count the bot itself
             float pJoin[5] = {0.03,0.42,0.5,0.51,0.51};
-            float pLeave[5] = {1,1.0/49,1.0/424,1.0/700,1.0/1306};
+            float pLeave[5] = {1,0.02,0.00236,0.0014,0.000766};
             if(n>4)
                 n=4;
             switch(state) {
@@ -194,6 +212,7 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
                     return 1-pLeave[n];
                     break;
             }
+            break;
     }
 }
 
@@ -201,6 +220,7 @@ void CFootBotAggregation::Walk() {
     --walkTurns;
     if(walkTurns == 0) {
         float p = ComputeProba(CountNeighbours());
+        //cout<<p<<endl;
         if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
             ChangeState(STATE_STAY);
         else

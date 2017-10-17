@@ -63,7 +63,7 @@ void CVisualise::Init(TConfigurationNode& t_tree) {
         CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
         footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.SetX(a);
         footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.SetY(b);
-        (static_cast<CFootBotAggregation_NG&>(footbotEntity.GetControllableEntity().GetController())).UpdateLexicon(c);
+        (static_cast<CFootBotAggregation_NG&>(footbotEntity.GetControllableEntity().GetController())).hear(c);
         ++it;
     }
 }
