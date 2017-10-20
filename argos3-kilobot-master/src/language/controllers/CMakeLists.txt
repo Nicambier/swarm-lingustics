@@ -1,0 +1,2 @@
+add_subdirectory(kilobot_aggregation)
+add_subdirectory(kilobot_diffusion)

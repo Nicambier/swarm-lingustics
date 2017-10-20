@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+
+  <!-- ************************* -->
+  <!-- * General configuration * -->
+  <!-- ************************* -->
+  <framework>
+    <system threads="0" />
+    <experiment length="0"
+                ticks_per_second="10" />
+  </framework>
+
+  <!-- *************** -->
+  <!-- * Controllers * -->
+  <!-- *************** -->
+  <controllers>
+
+    <kilobot_aggregation_controller id="fac"
+                                  library="build/language/controllers/kilobot_aggregation/libkilobot_aggregation.so">
+      <actuators>
+        <differential_steering implementation="default" />
+        <kilobot_communication implementation="default" medium="kilomedium"/>
+      </actuators>
+      <sensors>
+        <kilobot_communication implementation="default" medium="kilomedium" show_rays="true" />
+      </sensors>
+      <params aParam="5" bParam="5" minDist="70" />
+    </kilobot_aggregation_controller>
+
+  </controllers>
+
+  <!-- *********************** -->
+  <!-- * Arena configuration * -->
+  <!-- *********************** -->
+  <arena size="2, 2, 1" center="0,0,0.5">
+
+    <box id="wall_north" size="1.05,0.05,0.05" movable="false">
+      <body position="0,0.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="1.05,0.05,0.05" movable="false">
+      <body position="0,-0.5,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.05,1,0.05" movable="false">
+      <body position="0.5,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.05,1,0.05" movable="false">
+      <body position="-0.5,0,0" orientation="0,0,0" />
+    </box>
+
+    <!--
+        You can distribute entities randomly. Here, we distribute
+        10 kilobots in this way:
+        - the position is uniformly distributed
+        on the ground, in the square whose corners are (-2,-2) and (2,2)
+        - the orientations are non-zero only when rotating around Z and chosen
+        from a gaussian distribution, whose mean is zero degrees and
+        standard deviation is 360 degrees.
+    -->
+    <distribute>
+      <position method="uniform" min="-0.5,-0.5,0" max="0.5,0.5,0" />
+      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
+      <entity quantity="30" max_trials="100">
+        <kilobot id="kb">
+          <controller config="fac" />
+        </kilobot>
+      </entity>
+    </distribute>
+    
+    </arena>
+
+  <!-- ******************* -->
+  <!-- * Physics engines * -->
+  <!-- ******************* -->
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+
+  <!-- ********* -->
+  <!-- * Media * -->
+  <!-- ********* -->
+  <media>
+    <kilobot_communication id="kilomedium" />
+  </media>
+
+  <!-- ****************** -->
+  <!-- * Visualization * -->
+  <!-- ****************** -->
+  <visualization>
+    <qt-opengl>
+      <camera>
+        <placement idx="0" position="0,0,1" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="1" position="0.25,0.25,0.25" look_at="0,0,0" lens_focal_length="20" />
+      </camera>
+    </qt-opengl>
+  </visualization>
+
+</argos-configuration>
