@@ -34,7 +34,7 @@ int countClusters(list< pair<float,float> > pos) {
     pair<float,float> seed;
     while(pos.size() > 0) {
         int size = clusterSize(pos.begin(),pos);
-        if(size >= 3) {
+        if(size >= 2) {
             ++c;
             cout<<size<<" ";
         }

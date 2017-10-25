@@ -25,30 +25,15 @@ void CFootBotAggregation_NG::Reset() {
 /****************************************/
 /****************************************/
 
-void CFootBotAggregation_NG::ChangeState(unsigned short int newState) {
-    CFootBotAggregation::ChangeState(newState);
-    switch(newState) {
-//         case STATE_WALK:
-//             speak(false);
-//             break;
-        case STATE_STAY:
-            speak(true);
-            break;
-        case STATE_LEAVE:
-            speak(false);
-            break;
-    }
-}
-
-void CFootBotAggregation_NG::speak(bool activate) {
+void CFootBotAggregation_NG::speak(bool activate, int channel) {
     if(activate) {
         if(lexicon.size()==0)
             currentWord = m_pcRNG->Uniform(CRange<UInt32>(1,256));
         else
             currentWord = lexicon[m_pcRNG->Uniform(CRange<UInt32>(0,lexicon.size()))];
-        m_pcRABA->SetData(0, currentWord);
+        m_pcRABA->SetData(channel, currentWord);
     } else
-        m_pcRABA->SetData(0, 0);
+        m_pcRABA->SetData(channel, 0);
 }
 
 bool CFootBotAggregation_NG::hear(unsigned short int w) {
@@ -56,11 +41,9 @@ bool CFootBotAggregation_NG::hear(unsigned short int w) {
 
     if(w > 0) {
         for (vector<unsigned short int>::iterator it = lexicon.begin() ; it != lexicon.end() && !inside; ++it) {
-            cout<<w<<" "<<*it<<" ";
             if(w == *it) {
                 inside = true;
             }
-            cout<<inside<<endl;
         }
                 
         if(inside) {
@@ -76,36 +59,17 @@ bool CFootBotAggregation_NG::hear(unsigned short int w) {
     return inside;
 }
 
-unsigned int CFootBotAggregation_NG::CountNeighbours() {
-    const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-    unsigned int counter = 1;
-    for(size_t i = 0; i < tPackets.size(); ++i) {
-        if(tPackets[i].Range < minDist) {
-            if(hear(tPackets[i].Data[0]))
-                ++counter;
-            else
-                counter = 1;
-        }
-    }
+unsigned short int CFootBotAggregation_NG::GetWord() {
+    unsigned short int w=0;//means no convergence
     
-    return counter;
+    if(lexicon.size()==1)
+        w = lexicon.front();
+    
+    return w;
 }
 
-// void CFootBotAggregation_NG::Stay() {
-//     //m_pcRABA->SetData(0, currentWord); //uncomment if bots behave weirdly... but I don't know why it's there...
-//     CFootBotAggregation::Stay();
-// }
-
-string CFootBotAggregation_NG::GetState() {
-    string word = "N/A";
-    
-    if(lexicon.size()==1) {
-        ostringstream temp;
-        temp << lexicon.front();
-        word = temp.str();
-    }
-    
-    return CFootBotAggregation::GetState()+" "+word;
+vector<unsigned short int> CFootBotAggregation_NG::GetLexicon() {
+    return lexicon;
 }
 
 /****************************************/

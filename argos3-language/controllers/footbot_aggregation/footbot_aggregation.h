@@ -25,7 +25,6 @@
 #define STATE_WALK 0
 #define STATE_STAY 1
 #define STATE_LEAVE 2
-#define STATE_AVOID 3
 
 
 
@@ -143,7 +142,7 @@ protected:
    Real m_fWheelVelocity;
    
    /* Base staying proba */
-   Real a,b,c;
+   Real a,b;
    unsigned int minDist,m_fStayTurns,m_fLeaveTurns,m_fWalkTurns;
    
    /* Angle tolerance range to go straight.

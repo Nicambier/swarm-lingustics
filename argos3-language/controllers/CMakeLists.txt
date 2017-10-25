@@ -2,4 +2,7 @@ include_directories(${CMAKE_SOURCE_DIR}/controllers)
 
 add_subdirectory(footbot_aggregation)
 add_subdirectory(footbot_aggregation_NG)
+add_subdirectory(footbot_aggregation_nNG)
+add_subdirectory(footbot_aggregation_wNG)
+add_subdirectory(footbot_aggregation_sNG)
 add_subdirectory(footbot_stopNG)

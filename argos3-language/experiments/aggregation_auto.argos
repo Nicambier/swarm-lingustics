@@ -6,7 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="8" />
-    <experiment length="100000"
+    <experiment length="20000"
                 ticks_per_second="10"/>
   </framework>
   
@@ -20,43 +20,31 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_aggregation_NG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_NG/libfootbot_aggregation_NG.so">
+    <footbot_aggregation_nNG_controller id="fdc"
+                                  library="../build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
         <footbot_proximity implementation="default" show_rays="false" />
-        <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
-      <params alpha="90" delta="0.5" velocity="10" baseProba="0.25" leaveTurns="50" stayTurns="200" walkTurns="1" rule="1" />
-    </footbot_aggregation_NG_controller>
+      <params minDist="70" aParam="3" bParam="2" leaveTurns="1" stayTurns="1" walkTurns="1" rule="2" />
+    </footbot_aggregation_nNG_controller>
 
   </controllers>
 
    <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="6, 7.5, 1" center="0,0,0.5">
-
-    <box id="bn" size="0.1, 7.5, 0.2" movable="false">
-      <body position="3,0,0"  orientation="0,0,0" />
-    </box>
-    <box id="bs" size="0.1, 7.5, 0.2" movable="false">
-      <body position="-3,0,0" orientation="0,0,0" />
-    </box>
-    <box id="be" size="6, 0.1, 0.2" movable="false">
-      <body position="0,-3.75,0" orientation="0,0,0" />
-    </box>
-    <box id="bw" size="6, 0.1, 0.2" movable="false">
-      <body position="0,3.75,0" orientation="0,0,0" />
-    </box>
+  <arena size="10, 10, 1" center="0,0,0.5">
+      <!--floor id="g" source="image" path="plain.png" /> <!--Can't delete that because of the getFloorColour() function in the c file-->
 
     <distribute>
-      <position method="uniform" min="-3,-3.75,0" max="3,3.75,0" /> 
+      <position method="uniform" min="-3.5,-3.5,0" max="3.5,3.5,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="10" max_trials="100"> 
+      <entity quantity="30" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="fdc" />

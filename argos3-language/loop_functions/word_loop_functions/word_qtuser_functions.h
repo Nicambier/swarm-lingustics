@@ -3,7 +3,8 @@
 
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
-#include "../../controllers/footbot_aggregation/footbot_aggregation.h"
+#include "../../controllers/footbot_aggregation_NG/footbot_aggregation_NG.h"
+#include <string>
 #include <sstream>
 
 using namespace argos;

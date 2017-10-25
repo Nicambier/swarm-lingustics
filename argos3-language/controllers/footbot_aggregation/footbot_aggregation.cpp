@@ -17,7 +17,6 @@ CFootBotAggregation::CFootBotAggregation() :
    minDist(1),
    a(0.14f),
    b(0),
-   c(0),
    m_fStayTurns(50),
    m_fLeaveTurns(50),
    m_fWalkTurns(50),
@@ -73,9 +72,8 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
    m_fDelta = 0.5;
    m_fWheelVelocity = 10;
    GetNodeAttributeOrDefault(t_node, "minDist", minDist, minDist);
-   GetNodeAttributeOrDefault(t_node, "a", a, a);
-   GetNodeAttributeOrDefault(t_node, "b", b, b);
-   GetNodeAttributeOrDefault(t_node, "c", c, c);
+   GetNodeAttributeOrDefault(t_node, "aParam", a, a);
+   GetNodeAttributeOrDefault(t_node, "bParam", b, b);
    GetNodeAttributeOrDefault(t_node, "leaveTurns", m_fLeaveTurns, m_fLeaveTurns);
    GetNodeAttributeOrDefault(t_node, "stayTurns", m_fStayTurns, m_fStayTurns);
    GetNodeAttributeOrDefault(t_node, "walkTurns", m_fWalkTurns, m_fWalkTurns);
@@ -194,7 +192,7 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
                     return 0.03+0.48*(1-exp(-a*n));
                     break;
                 case STATE_STAY: //1-P_leave
-                    return 1-exp(-c*n);
+                    return 1-exp(-b*n);
                     break;
             }
             break;

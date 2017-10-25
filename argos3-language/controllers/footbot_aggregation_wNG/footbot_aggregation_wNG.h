@@ -1,7 +1,7 @@
-#ifndef FOOTBOT_AGGREGATION_NG_H
-#define FOOTBOT_AGGREGATION_NG_H
+#ifndef FOOTBOT_AGGREGATION_wNG_H
+#define FOOTBOT_AGGREGATION_wNG_H
 
-#include "../footbot_aggregation/footbot_aggregation.h"
+#include "../footbot_aggregation_NG/footbot_aggregation_NG.h"
 #include <sstream>
 #include <string>
 #include <vector>
@@ -14,15 +14,15 @@
 using namespace argos;
 using namespace std;
 
-class CFootBotAggregation_NG : public CFootBotAggregation {
+class CFootBotAggregation_wNG : public CFootBotAggregation_NG {
 
 public:
 
    /* Class constructor. */
-   CFootBotAggregation_NG();
+   CFootBotAggregation_wNG();
 
    /* Class destructor. */
-   virtual ~CFootBotAggregation_NG() {}
+   virtual ~CFootBotAggregation_wNG() {}
 
    /*
     * This function initializes the controller.
@@ -31,11 +31,11 @@ public:
     */
    virtual void Init(TConfigurationNode& t_node);
    
-   virtual void speak(bool activate, int channel = 0);
-   virtual bool hear(unsigned short int w);
+   virtual void ChangeState(unsigned short int newState);
    
-   virtual unsigned short int GetWord();
-   virtual vector<unsigned short int> GetLexicon();
+   virtual unsigned int CountNeighbours();
+   
+   //virtual void Stay();
 
    /*
     * This function resets the controller to its state right after the
@@ -54,10 +54,6 @@ public:
     * completeness.
     */
    virtual void Destroy() {}
-
-private:
-    unsigned short int currentWord;
-    vector<unsigned short int> lexicon;
 
 
 };

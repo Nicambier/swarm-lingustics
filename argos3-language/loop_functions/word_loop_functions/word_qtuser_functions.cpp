@@ -18,7 +18,7 @@ void CWORDQTUserFunctions::Draw(CFootBotEntity& c_entity) {
     */
 
    int v;
-   std::string s = (static_cast<CFootBotAggregation&>(c_entity.GetControllableEntity().GetController())).GetState();
+   std::string s = std::to_string((static_cast<CFootBotAggregation_NG&>(c_entity.GetControllableEntity().GetController())).GetWord());
    DrawText(CVector3(0.15, 0.15, 0.1),   // position
             s.c_str()); // text
    

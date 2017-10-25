@@ -1,51 +1,52 @@
 #!/bin/bash
+mkdir results
 
-for i in 21
+pr="$(nproc)"
+pr="$((pr-1))"
+
+for i in $(seq 1 1 2)
 do
     mkdir results/"$i"/
     
-    for version in 1 2 #1=NG 2=vanilla
+    FILE='aggregation_auto.argos'
+    
+    for version in 'n' 'w' 's'
     do
-        case $version in
-            1)
-            V='NG'
-            sed -e 's/library="..\/build\/controllers\/[^\"]*"/library="..\/build\/controllers\/footbot_aggregation_NG\/libfootbot_aggregation_NG.so"/' aggregation_auto.argos > tmp1
-            sed -e 's/footbot_aggregation.*controller/footbot_aggregation_NG_controller/' tmp1 > tmp2
-            ;;
-            2)
-            V='V'
-            sed -e 's/library="..\/build\/controllers\/[^\"]*"/library="..\/build\/controllers\/footbot_aggregation\/libfootbot_aggregation.so"/' aggregation_auto.argos > tmp1
-            sed -e 's/footbot_aggregation.*controller/footbot_aggregation_controller/' tmp1 > tmp2
-            ;;
-        esac
+        sed -e 's/library="..\/build\/controllers\/[^\"]*"/library="..\/build\/controllers\/footbot_aggregation_'"$version"'NG\/libfootbot_aggregation_'"$version"'NG.so"/' $FILE > tmp1
+        sed -e 's/footbot_aggregation.*controller/footbot_aggregation_'"$version"'NG_controller/' tmp1 > tmp2
         
-        for swarm in 20 100
+        for swarm in 30 100 200
         do
-            cat tmp2 > tmp3
-            
-            for arena in 1
+            sed -e 's/<entity quantity=".*" max_trials="100">/<entity quantity="'"$swarm"'" max_trials="100">/' tmp2 > tmp3
+        
+            a=1
+            for aParam in 4.6 2.3 1.5 1.15 0.9 0.75 0.65 0.6
             do
-                sed -e 's/<entity quantity=".*" max_trials="100">/<entity quantity="'"$swarm"'" max_trials="100">/' tmp3 > tmp4
+                sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp3 > tmp4
                 
-                for proba in 14 17 20
+                b=1
+                for bParam in 4.6 2.3 1.5 1.15 0.9 0.75 0.65 0.6
                 do
-                    sed -e 's/baseProba="[^\"]*"/baseProba="0.'"$proba"'"/' tmp4 > tmp5
+                    sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > tmp5
                     
-                    sed -e 's/output="[^\"]*"/output="results\/'"$i"'\/'"$V"'_s'"$swarm"'_a'"$arena"'_p'"$proba"'.txt"/'  tmp5 > aggregation_"$V"_s"$swarm"_a"$arena"_p"$proba".argos
-                    argos3 -c aggregation_"$V"_s"$swarm"_a"$arena"_p"$proba".argos &
+                    sed -e 's/output="[^\"]*"/output="results\/'"$i"'\/'"$version"'NG_s'"$swarm"'_a'"$a"'_b'"$b"'.txt"/'  tmp5 > tmp.argos
+                    argos3 -c tmp.argos &
         
                     T="$(pgrep -c argos3)"
-                    while [ "$T" -gt 5 ]; do
+                    while [ "$T" -gt "$pr" ]; do
                         sleep 10
                         T="$(pgrep -c argos3)"
                     done
+                    
+                    b="$((b+1))"
                 done
+            a="$((a+1))"
             done
         done
     done
     if [ "$(pgrep -c argos3)" -lt 1 ]
     then 
-        rm aggregation_*_s*_a*_p*.argos
+        echo "done"
         rm tmp*
     fi
     

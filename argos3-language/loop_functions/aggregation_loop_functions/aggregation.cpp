@@ -3,16 +3,10 @@
 #include <algorithm>
 #include <cstring>
 #include <cerrno>
-
 /****************************************/
 /****************************************/
 
-static const Real OBJECT_RADIUS            = 0.1f;
-static const Real OBJECT_DIAMETER          = OBJECT_RADIUS * 2.0f;
-static const Real CONSTRUCTION_AREA_MIN_X  = 4.5f;
-static const Real CONSTRUCTION_AREA_MAX_X  = 5.2f;
-static const Real CONSTRUCTION_AREA_SIZE_X = CONSTRUCTION_AREA_MAX_X - CONSTRUCTION_AREA_MIN_X;
-static const Real CONSTRUCTION_AREA_SIZE_Y = 4.0f - 0.2f - 0.2f; // arena size_y - west_wall size_y - east_wall size_y
+static const Real BOT_RADIUS            = 0.14f;
 
 /****************************************/
 /****************************************/
@@ -38,6 +32,25 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
    }
+   
+   ////////////////////////////////////////////////////////////////////////////////// CREATION AND POSITIONING OF THE ARENA WALLS////////////////////////////////////////////////////////////////////////////////
+    CVector3 arena_size = GetSpace().GetArenaSize();
+    int m_fArenaRadius = Min(arena_size[0],arena_size[1])/2;
+    int m_unNumArenaWalls = 20;
+
+    CRadians wall_angle = CRadians::TWO_PI/m_unNumArenaWalls;CVector3 wall_size(0.05, 2.0*m_fArenaRadius*Tan(CRadians::PI/m_unNumArenaWalls), 0.1);
+    ostringstream entity_id;
+    for( UInt32 i = 0; i < m_unNumArenaWalls; i++ ) {
+        entity_id.str("");entity_id << "wall_" << i;
+        CRadians wall_rotation = wall_angle*i;
+        
+        CVector3 wall_position( m_fArenaRadius*Cos(wall_rotation), m_fArenaRadius*Sin(wall_rotation), 0 );
+        CQuaternion wall_orientation;
+        wall_orientation.FromEulerAngles( wall_rotation, CRadians::ZERO, CRadians::ZERO );
+        
+        CBoxEntity* box = new CBoxEntity(entity_id.str(), wall_position, wall_orientation, false, wall_size, (Real)1.0 );
+        AddEntity( *box );
+    }
 }
 
 /****************************************/
@@ -77,20 +90,104 @@ void CAggregation::PreStep() {
 /****************************************/
 /****************************************/
 
-void CAggregation::PostStep() {
-    m_cOutFile << GetSpace().GetSimulationClock() << "\t";
-    CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
-		for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end(); ++it) {
-			CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
-			Real Robot_X = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetX();
-			Real Robot_Y = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetY();
-            std::string state = (static_cast<CFootBotAggregation&>(footbotEntity.GetControllableEntity().GetController())).GetState();
-			m_cOutFile << "(" << Robot_X << ", " << Robot_Y << ", " << state << ") ";
-		}
-     m_cOutFile << std::endl;
+list< pair<float,float> > CAggregation::findCluster(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos) {
+    list< pair<float,float> > cluster;
+    pair<float,float> s = *seed;
+    cluster.push_back(s);
+    pos.erase(seed);
+    
+    list< pair<float,float> > temp;
+    if(pos.size() > 0) {
+        bool hasNeighbours = true;
+        while(hasNeighbours) {
+            hasNeighbours = false;
+            for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < 0.7) {
+                    hasNeighbours = true;
+                    temp = findCluster(it,pos);
+                    for (list< pair<float,float> >::iterator it2=temp.begin(); it2 != temp.end(); ++it2)
+                        cluster.push_back(*it2);
+                    break;
+                }                
+            }
+        }
+    }
+    
+    return cluster;
 }
 
-bool CAggregation::IsExperimentFinished() {
+double CAggregation::std2D(list< pair<float,float> > pos) {
+    pair<float, float> accPos = make_pair(0,0);
+    for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+        accPos.first += it->first;
+        accPos.second += it->second;
+    }
+    pair<float, float> meanPos = make_pair(accPos.first/pos.size(),accPos.second/pos.size());
+    
+    double accStd = 0;
+    for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+        accStd += pow((it->first - meanPos.first),2)+pow((it->second - meanPos.second),2);
+    }
+    
+    return accStd/(pos.size()*4*pow(BOT_RADIUS,2));
+}
+
+int CAggregation::clustersInfo(list< pair<float,float> > pos, vector<int>& sizes, vector<double>& stds) {
+    pair<float,float> seed;
+    list< pair<float,float> > cluster;
+    while(pos.size() > 0) {
+        cluster = findCluster(pos.begin(),pos);
+        if(cluster.size() >= 2) {
+            sizes.push_back(cluster.size());
+            stds.push_back(std2D(cluster));
+        }
+    }
+            
+    return sizes.size();
+}
+
+void CAggregation::PostStep() {
+    int clock = GetSpace().GetSimulationClock();
+    if(clock%50==0) {
+        list< pair<float,float> > positions;
+        set<unsigned short int> words;
+        vector<unsigned short int> lexi;
+        m_cOutFile << clock << "\t";
+        CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
+        for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end(); ++it) {
+            CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
+            CFootBotAggregation_NG& controller = static_cast<CFootBotAggregation_NG&>(footbotEntity.GetControllableEntity().GetController());
+            string state = controller.GetState();
+            if(state=="STAY") {
+                Real Robot_X = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetX();
+                Real Robot_Y = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetY();
+                positions.push_back(make_pair(Robot_X,Robot_Y));
+                lexi = controller.GetLexicon();
+                for(int i=0; i<lexi.size(); ++i)
+                    words.insert(lexi[i]);
+            }
+        }
+        
+        vector<int> sizes;
+        vector<double> stds;
+        clustersInfo(positions,sizes,stds);
+        
+        int sizeAcc = 0;
+        double stdAcc = 0;
+        int nb = sizes.size();
+        for(int i=0; i<nb; ++i) {
+            sizeAcc += sizes[i];
+            stdAcc += stds[i];
+        }
+
+        m_cOutFile<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb<<" "<<stdAcc/nb;
+        for(int i=0; i<nb; ++i)
+            m_cOutFile<<" "<<sizes[i];
+        m_cOutFile<<endl;
+    }
+}
+
+/*bool CAggregation::IsExperimentFinished() {
     bool stabilised = true;
     CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
 		for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end() and stabilised; ++it) {
@@ -100,7 +197,7 @@ bool CAggregation::IsExperimentFinished() {
                 stabilised = false;
 		}
      return stabilised;
-}
+}*/
 
 /****************************************/
 /****************************************/

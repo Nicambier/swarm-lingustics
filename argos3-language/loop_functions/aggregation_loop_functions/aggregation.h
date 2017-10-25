@@ -1,8 +1,18 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/foot-bot/simulator/footbot_entity.h>
 #include <argos3/plugins/simulator/visualizations/qt-opengl/qtopengl_user_functions.h>
-#include "../../controllers/footbot_aggregation/footbot_aggregation.h"
+#include "../../controllers/footbot_aggregation_NG/footbot_aggregation_NG.h"
+#include "argos3/plugins/simulator/entities/box_entity.h"
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <set>
+#include <utility>
+#include <list>
+#include <math.h> 
+
 
 using namespace argos;
 
@@ -43,6 +53,10 @@ public:
     * Performs actions right before a simulation step is executed.
     */
    virtual void PreStep();
+   
+   list< pair<float,float> > findCluster(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos);
+   double std2D(list< pair<float,float> > pos);
+   int clustersInfo(list< pair<float,float> > pos, vector<int>& sizes, vector<double>& stds);
 
    /**
     * Performs actions right after a simulation step is executed.
@@ -52,14 +66,12 @@ public:
    /**
     * Determines the end of the experiment.
     */
-   virtual bool IsExperimentFinished();
+   //virtual bool IsExperimentFinished();
 
 private:
 
 
-private:
-
-   /**
+private:   /**
     * The path of the output file.
     */
    std::string m_strOutFile;

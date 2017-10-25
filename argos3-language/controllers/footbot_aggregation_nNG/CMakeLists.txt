@@ -1,0 +1,6 @@
+add_library(footbot_aggregation_nNG SHARED footbot_aggregation_nNG.h footbot_aggregation_nNG.cpp)
+target_link_libraries(footbot_aggregation_nNG
+  footbot_aggregation_NG
+  argos3core_simulator
+  argos3plugin_simulator_footbot
+  argos3plugin_simulator_genericrobot)
