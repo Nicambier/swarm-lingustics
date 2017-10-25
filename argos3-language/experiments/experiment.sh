@@ -4,7 +4,7 @@ mkdir results
 pr="$(nproc)"
 pr="$((pr-1))"
 
-for i in $(seq 1 1 2)
+for i in $(seq 1 1 50)
 do
     mkdir results/"$i"/
     
