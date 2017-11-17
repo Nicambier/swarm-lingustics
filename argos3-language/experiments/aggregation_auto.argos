@@ -5,8 +5,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="8" />
-    <experiment length="20000"
+    <system threads="1" />
+    <experiment length="100000"
                 ticks_per_second="10"/>
   </framework>
   
@@ -38,11 +38,11 @@
    <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 10, 1" center="0,0,0.5">
+  <arena size="20, 20, 1" center="0,0,0.5">
       <!--floor id="g" source="image" path="plain.png" /> <!--Can't delete that because of the getFloorColour() function in the c file-->
 
     <distribute>
-      <position method="uniform" min="-3.5,-3.5,0" max="3.5,3.5,0" /> 
+      <position method="uniform" min="-7,-7,0" max="7,7,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
       <entity quantity="30" max_trials="100"> 
         <foot-bot id="fb" 
