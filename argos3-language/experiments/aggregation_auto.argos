@@ -13,7 +13,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" />
+  <loop_functions library="home/vtrianni/swarm-lingustics/argos3-language/build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -21,7 +21,7 @@
   <controllers>
 
     <footbot_aggregation_nNG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
+                                  library="home/vtrianni/swarm-lingustics/argos3-language/build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />

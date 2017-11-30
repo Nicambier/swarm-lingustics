@@ -1,5 +1,5 @@
 #!/bin/bash
-mkdir /tmp/vtrianni/swarm_results
+mkdir -p /tmp/NG_results
 mkdir results
 
 pr="$(nproc)"
@@ -26,19 +26,9 @@ do
             do
                 sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > tmp5
                 
-                mkdir /tmp/vtrianni/swarm_results/"$version"NG_s"$swarm"_a"$a"_b"$b"
-                
-                for i in $(seq 1 1 50)
-                do
-                    sed -e 's/output="[^\"]*"/output="/tmp/vtrianni/swarm_results\/'"$version"'NG_s'"$swarm"'_a'"$a"'_b'"$b"'\/'"$i"'.txt"/'  tmp5 > tmp.argos
-                    qsub run.sh -N "$version"NG_s"$swarm"_a"$a"_b"$b"_"$i"
-        
-                    #T="$(pgrep -c argos3)"
-                    #while [ "$T" -gt "$pr" ]; 
-                    #do
-                    #    sleep 10
-                    #    T="$(pgrep -c argos3)"
-                    #done
+                mkdir /tmp/NG_results/"$version"NG_s"$swarm"_a"$a"_b"$b"
+                cp tmp5 /tmp/NG_results/"$version"NG_s"$swarm"_a"$a"_b"$b"/tmp
+                qsub run.sh -N "$version"NG_s"$swarm"_a"$a"_b"$b"
                 done                
                 b="$((b+1))"
             done
@@ -46,10 +36,3 @@ do
         done
     done
 done
-
-#if [ "$(pgrep -c argos3)" -lt 1 ]
-#then 
-#    cp -rf /tmp/swarm_results results/
-#    echo "done"
-#    rm tmp*
-#fi

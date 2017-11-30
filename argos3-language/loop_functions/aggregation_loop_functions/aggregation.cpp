@@ -148,7 +148,7 @@ int CAggregation::clustersInfo(list< pair<float,float> > pos, vector<int>& sizes
 
 void CAggregation::PostStep() {
     int clock = GetSpace().GetSimulationClock();
-    if(clock%50==0) {
+    if(clock%100==0) {
         list< pair<float,float> > positions;
         set<unsigned short int> words;
         vector<unsigned short int> lexi;
