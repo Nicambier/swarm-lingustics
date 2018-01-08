@@ -1,9 +1,5 @@
 #!/bin/bash
-mkdir -p /tmp/NG_results
 mkdir results
-
-pr="$(nproc)"
-pr="$((pr-1))"
     
 FILE='aggregation_auto.argos'
 
@@ -17,22 +13,21 @@ do
         sed -e 's/<entity quantity=".*" max_trials="100">/<entity quantity="'"$swarm"'" max_trials="100">/' tmp2 > tmp3
     
         a=1
-        for aParam in 4.6 2.3 1.5 1.15 0.9 0.75 0.65
+        for aParam in $(seq 0.2 0.4 3)
         do
             sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp3 > tmp4
             
             b=1
-            for bParam in 4.6 2.3 1.5 1.15 0.9 0.75 0.65
+            for bParam in $(seq 0.2 0.4 3)
             do
-                sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > tmp5
-                
-                mkdir /tmp/NG_results/"$version"NG_s"$swarm"_a"$a"_b"$b"
-                cp tmp5 /tmp/NG_results/"$version"NG_s"$swarm"_a"$a"_b"$b"/tmp
+                sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > $version"NG_s"$swarm"_a"$a"_b"$b".argos
                 qsub run.sh -N "$version"NG_s"$swarm"_a"$a"_b"$b"
-                done                
+                                
                 b="$((b+1))"
             done
         a="$((a+1))"
         done
     done
 done
+
+rm -f tmp*

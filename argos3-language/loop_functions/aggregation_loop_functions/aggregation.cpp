@@ -27,6 +27,9 @@ CAggregation::~CAggregation() {
 void CAggregation::Init(TConfigurationNode& t_tree) {
    /* Get output file name from XML tree */
    GetNodeAttribute(t_tree, "output", m_strOutFile);
+   
+   GetNodeAttributeOrDefault(t_tree, "minDist", minDist, minDist);
+
    /* Open the file for text writing */
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
    if(m_cOutFile.fail()) {
@@ -97,12 +100,13 @@ list< pair<float,float> > CAggregation::findCluster(list< pair<float,float> >::i
     pos.erase(seed);
     
     list< pair<float,float> > temp;
+    float d = minDist*0.01;
     if(pos.size() > 0) {
         bool hasNeighbours = true;
         while(hasNeighbours) {
             hasNeighbours = false;
             for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
-                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < 0.7) {
+                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < d) {
                     hasNeighbours = true;
                     temp = findCluster(it,pos);
                     for (list< pair<float,float> >::iterator it2=temp.begin(); it2 != temp.end(); ++it2)

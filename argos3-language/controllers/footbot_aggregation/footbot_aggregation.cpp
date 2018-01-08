@@ -145,12 +145,10 @@ void CFootBotAggregation::Move() {
 
 void CFootBotAggregation::ChangeState(unsigned short int newState) {
     if(probaRule==2) {
-        //m_pcRABA->SetData(0, STATE_STAY);
         if(newState==STATE_LEAVE)
             newState = STATE_WALK;
     }
-    //else
-        m_pcRABA->SetData(0, newState);
+    m_pcRABA->SetData(0, newState);
     state = newState;
     switch(newState) {
         case STATE_WALK:
@@ -189,10 +187,12 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
             --n;
             switch(state) {
                 case STATE_WALK: //P_join
-                    return 0.03+0.48*(1-exp(-a*n));
+                    return 0.05+0.45*(1-exp(-a*n));
+                    //return 0.03+0.48*(1-exp(-a*n));
                     break;
                 case STATE_STAY: //1-P_leave
-                    return 1-exp(-b*n);
+                    return 1-0.75*exp(-b*n);
+                    //return 1-exp(-b*n);
                     break;
             }
             break;

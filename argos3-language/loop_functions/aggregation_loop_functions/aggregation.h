@@ -90,5 +90,7 @@ private:   /**
     * Minimum and maximum Y coordinate for the objects in the construction area
     */
    Real m_fMinObjectY, m_fMaxObjectY;
+   
+   unsigned int minDist;
 
 };

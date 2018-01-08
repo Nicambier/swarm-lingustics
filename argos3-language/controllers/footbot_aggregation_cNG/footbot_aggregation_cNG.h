@@ -1,5 +1,5 @@
-#ifndef FOOTBOT_AGGREGATION_sNG_H
-#define FOOTBOT_AGGREGATION_sNG_H
+#ifndef FOOTBOT_AGGREGATION_cNG_H
+#define FOOTBOT_AGGREGATION_cNG_H
 
 #include "../footbot_aggregation_NG/footbot_aggregation_NG.h"
 #include <sstream>
@@ -14,15 +14,15 @@
 using namespace argos;
 using namespace std;
 
-class CFootBotAggregation_sNG : public CFootBotAggregation_NG {
+class CFootBotAggregation_cNG : public CFootBotAggregation_NG {
 
 public:
 
    /* Class constructor. */
-   CFootBotAggregation_sNG();
+   CFootBotAggregation_cNG();
 
    /* Class destructor. */
-   virtual ~CFootBotAggregation_sNG() {}
+   virtual ~CFootBotAggregation_cNG() {}
 
    /*
     * This function initializes the controller.
@@ -34,6 +34,10 @@ public:
    virtual void ChangeState(unsigned short int newState);
    
    virtual unsigned int CountNeighbours();
+   
+   virtual float ComputeProba(unsigned int n);
+   
+   //virtual void Stay();
 
    /*
     * This function resets the controller to its state right after the
@@ -52,6 +56,9 @@ public:
     * completeness.
     */
    virtual void Destroy() {}
+   
+private:
+    Real values[8] = {0,4.6,2.3,1.5,1.15,0.9,0.75,0.65};
 
 
 };

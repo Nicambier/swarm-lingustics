@@ -1,35 +1,35 @@
 /* Include the controller definition */
-#include "footbot_aggregation_sNG.h"
+#include "footbot_aggregation_cNG.h"
 
 /****************************************/
 /****************************************/
 
 using namespace std;
 
-CFootBotAggregation_sNG::CFootBotAggregation_sNG() : CFootBotAggregation_NG() {}
+CFootBotAggregation_cNG::CFootBotAggregation_cNG() : CFootBotAggregation_NG() {}
    
    
 
 /****************************************/
 /****************************************/
 
-void CFootBotAggregation_sNG::Init(TConfigurationNode& t_node) {
+void CFootBotAggregation_cNG::Init(TConfigurationNode& t_node) {
     CFootBotAggregation_NG::Init(t_node);
 }
 
-void CFootBotAggregation_sNG::Reset() {
+void CFootBotAggregation_cNG::Reset() {
     CFootBotAggregation_NG::Reset();
 }
 
 /****************************************/
 /****************************************/
 
-void CFootBotAggregation_sNG::ChangeState(unsigned short int newState) {
+void CFootBotAggregation_cNG::ChangeState(unsigned short int newState) {
     CFootBotAggregation::ChangeState(newState);
     switch(newState) {
-        case STATE_WALK: 
-            speak(false); //this is to ensure that speak is turned off, even if we don't pass by the LEAVE state (rule 2)
-            break;
+        case STATE_WALK: //this is to ensure that speak is turned off, even if we don't pass by the LEAVE state (rule 2)
+             speak(false);
+             break;
         case STATE_STAY:
             speak(true);
             break;
@@ -39,7 +39,7 @@ void CFootBotAggregation_sNG::ChangeState(unsigned short int newState) {
     }
 }
 
-unsigned int CFootBotAggregation_sNG::CountNeighbours() {
+unsigned int CFootBotAggregation_cNG::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
     unsigned int counter = 1;
     for(size_t i = 0; i < tPackets.size(); ++i) {
@@ -54,6 +54,21 @@ unsigned int CFootBotAggregation_sNG::CountNeighbours() {
     return counter;
 }
 
+float CFootBotAggregation_cNG::ComputeProba(unsigned int n) {
+    short int w = GetWord();
+    a = 0.25*(w%16 + 1);
+    b = 0.25*(w/16 + 1);
+    cout << w << " " << a << " " << b << " " << endl;
+//     a = values[w%8];
+//     b = values[(w/8)%8];
+    return CFootBotAggregation::ComputeProba(n);
+}
+
+// void CFootBotAggregation_cNG::Stay() {
+//     //m_pcRABA->SetData(0, currentWord); //uncomment if bots behave weirdly... but I don't know why it's there...
+//     CFootBotAggregation::Stay();
+// }
+
 /****************************************/
 /****************************************/
 
@@ -67,4 +82,4 @@ unsigned int CFootBotAggregation_sNG::CountNeighbours() {
  * controller class to instantiate.
  * See also the configuration files for an example of how this is used.
  */
-REGISTER_CONTROLLER(CFootBotAggregation_sNG, "footbot_aggregation_sNG_controller")
+REGISTER_CONTROLLER(CFootBotAggregation_cNG, "footbot_aggregation_cNG_controller")

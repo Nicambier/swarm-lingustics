@@ -28,9 +28,8 @@ void CFootBotAggregation_NG::Reset() {
 void CFootBotAggregation_NG::speak(bool activate, int channel) {
     if(activate) {
         if(lexicon.size()==0)
-            currentWord = m_pcRNG->Uniform(CRange<UInt32>(1,256));
-        else
-            currentWord = lexicon[m_pcRNG->Uniform(CRange<UInt32>(0,lexicon.size()))];
+            lexicon.push_back(m_pcRNG->Uniform(CRange<UInt32>(1,256)));
+        currentWord = lexicon[m_pcRNG->Uniform(CRange<UInt32>(0,lexicon.size()))];
         m_pcRABA->SetData(channel, currentWord);
     } else
         m_pcRABA->SetData(channel, 0);
