@@ -66,7 +66,7 @@ public:
    /**
     * Determines the end of the experiment.
     */
-   //virtual bool IsExperimentFinished();
+   virtual bool IsExperimentFinished();
 
 private:
 
@@ -92,5 +92,6 @@ private:   /**
    Real m_fMinObjectY, m_fMaxObjectY;
    
    unsigned int minDist;
+   unsigned int timeStopCond;
 
 };

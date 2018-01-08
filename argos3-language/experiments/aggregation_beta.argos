@@ -13,7 +13,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" minDist="100" />
+  <loop_functions library="../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" minDist="100" timeStopCond="600" />
 
   <!-- *************** -->
   <!-- * Controllers * -->

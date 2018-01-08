@@ -29,6 +29,7 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    GetNodeAttribute(t_tree, "output", m_strOutFile);
    
    GetNodeAttributeOrDefault(t_tree, "minDist", minDist, minDist);
+   GetNodeAttributeOrDefault(t_tree, "timeStopCond", timeStopCond, timeStopCond);
 
    /* Open the file for text writing */
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -191,17 +192,19 @@ void CAggregation::PostStep() {
     }
 }
 
-/*bool CAggregation::IsExperimentFinished() {
-    bool stabilised = true;
-    CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
-		for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end() and stabilised; ++it) {
-            CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
-			CFootBotAggregation& footbot = static_cast<CFootBotAggregation&>(footbotEntity.GetControllableEntity().GetController());
-			if(footbot.LastMove() < 600)
-                stabilised = false;
-		}
-     return stabilised;
-}*/
+bool CAggregation::IsExperimentFinished() {
+    if(timeStopCond > 0) {
+        bool stabilised = true;
+        CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
+                    for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end() and stabilised; ++it) {
+                CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
+                            CFootBotAggregation& footbot = static_cast<CFootBotAggregation&>(footbotEntity.GetControllableEntity().GetController());
+                            if(footbot.LastMove() < timeStopCond)
+                    stabilised = false;
+                    }
+        return stabilised;
+    }
+}
 
 /****************************************/
 /****************************************/
