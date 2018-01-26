@@ -67,6 +67,10 @@ unsigned short int CFootBotAggregation_NG::GetWord() {
     return w;
 }
 
+string CFootBotAggregation_NG::text() {
+    return to_string(GetWord());
+}
+
 vector<unsigned short int> CFootBotAggregation_NG::GetLexicon() {
     return lexicon;
 }

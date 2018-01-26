@@ -6,14 +6,14 @@
   <!-- ************************* -->
   <framework>
     <system threads="1" />
-    <experiment length="100000"
+    <experiment length="5000"
                 ticks_per_second="10"/>
   </framework>
   
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="home/vtrianni/swarm-lingustics/argos3-language/build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" minDist="70" timeStopCond="0" />
+  <loop_functions library="home/vtrianni/swarm-lingustics/argos3-language/build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="res" minDist="70" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->

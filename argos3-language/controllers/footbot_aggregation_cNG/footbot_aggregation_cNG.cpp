@@ -58,10 +58,14 @@ float CFootBotAggregation_cNG::ComputeProba(unsigned int n) {
     short int w = GetWord();
     a = 0.25*(w%16 + 1);
     b = 0.25*(w/16 + 1);
-    cout << w << " " << a << " " << b << " " << endl;
-//     a = values[w%8];
-//     b = values[(w/8)%8];
+    //cout << w << " " << a << " " << b << " " << endl;
     return CFootBotAggregation::ComputeProba(n);
+}
+
+string CFootBotAggregation_cNG::text() {
+    int intA = (int) a;
+    int intB = (int) b;
+    return to_string(intA)+"."+to_string((int) ((a-intA)*100))+" "+to_string(intB)+"."+to_string((int) ((b-intB)*100));
 }
 
 // void CFootBotAggregation_cNG::Stay() {

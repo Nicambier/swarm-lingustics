@@ -137,6 +137,22 @@ double CAggregation::std2D(list< pair<float,float> > pos) {
     return accStd/(pos.size()*4*pow(BOT_RADIUS,2));
 }
 
+float CAggregation::connectivity(list< pair<float,float> > pos) {
+    pair<float, float> accPos = make_pair(0,0);
+    float tot;
+    float d = minDist*0.01;
+
+    for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+        for (list< pair<float,float> >::iterator it2=pos.begin(); it2 != pos.end(); ++it2) {
+            if(sqrt(pow((it->first - it2->first),2)+pow((it->second - it2->second),2)) < d) {
+                ++tot;
+            }
+        }
+    }
+    
+    return tot/pos.size();
+}
+
 int CAggregation::clustersInfo(list< pair<float,float> > pos, vector<int>& sizes, vector<double>& stds) {
     pair<float,float> seed;
     list< pair<float,float> > cluster;
@@ -163,16 +179,15 @@ void CAggregation::PostStep() {
             CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
             CFootBotAggregation_NG& controller = static_cast<CFootBotAggregation_NG&>(footbotEntity.GetControllableEntity().GetController());
             string state = controller.GetState();
-            if(state=="STAY") {
+            //if(state=="STAY") {
                 Real Robot_X = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetX();
                 Real Robot_Y = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetY();
                 positions.push_back(make_pair(Robot_X,Robot_Y));
                 lexi = controller.GetLexicon();
                 for(int i=0; i<lexi.size(); ++i)
                     words.insert(lexi[i]);
-            }
+            //}
         }
-        
         vector<int> sizes;
         vector<double> stds;
         clustersInfo(positions,sizes,stds);
@@ -185,7 +200,7 @@ void CAggregation::PostStep() {
             stdAcc += stds[i];
         }
 
-        m_cOutFile<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb<<" "<<stdAcc/nb;
+        m_cOutFile<<connectivity(positions)<<" "<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb<<" "<<stdAcc/nb;
         for(int i=0; i<nb; ++i)
             m_cOutFile<<" "<<sizes[i];
         m_cOutFile<<endl;

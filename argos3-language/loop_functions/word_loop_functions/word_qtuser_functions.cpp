@@ -16,13 +16,12 @@ void CWORDQTUserFunctions::Draw(CFootBotEntity& c_entity) {
     * See also the description in
     * $ argos3 -q foot-bot
     */
-
-   int v;
-   std::string s = std::to_string((static_cast<CFootBotAggregation_NG&>(c_entity.GetControllableEntity().GetController())).GetWord());
+   std::string s = static_cast<CFootBotAggregation_NG&>(c_entity.GetControllableEntity().GetController()).text();
    DrawText(CVector3(0.15, 0.15, 0.1),   // position
             s.c_str()); // text
    
-   /*stringstream convert(s);
+   /*int v = static_cast<CFootBotAggregation_NG&>(c_entity.GetControllableEntity().GetController()).GetWord();
+   stringstream convert(s);
    if ( (convert >> v) ) {
         DrawCircle(CVector3(0, 0, 0.1),
                             CQuaternion(0, 0, 0, 0),

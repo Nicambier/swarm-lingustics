@@ -35,6 +35,7 @@ public:
    virtual bool hear(unsigned short int w);
    
    virtual unsigned short int GetWord();
+   virtual string text();
    virtual vector<unsigned short int> GetLexicon();
 
    /*

@@ -37,6 +37,8 @@ public:
    
    virtual float ComputeProba(unsigned int n);
    
+   virtual string text();
+   
    //virtual void Stay();
 
    /*
@@ -58,7 +60,6 @@ public:
    virtual void Destroy() {}
    
 private:
-    Real values[8] = {0,4.6,2.3,1.5,1.15,0.9,0.75,0.65};
 
 
 };

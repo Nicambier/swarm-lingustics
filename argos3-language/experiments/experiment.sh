@@ -13,15 +13,19 @@ do
         sed -e 's/<entity quantity=".*" max_trials="100">/<entity quantity="'"$swarm"'" max_trials="100">/' tmp2 > tmp3
     
         a=1
-        for aParam in $(seq 0.2 0.4 3)
+        for aParam in 0.2 1.4 2.6
         do
             sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp3 > tmp4
             
             b=1
-            for bParam in $(seq 0.2 0.4 3)
+            for bParam in 1.2 2.0 2.4
             do
-                sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > $version"NG_s"$swarm"_a"$a"_b"$b".argos
-                qsub run.sh -N "$version"NG_s"$swarm"_a"$a"_b"$b"
+                sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmp4 > "$version"NG_s"$swarm"_a"$a"_b"$b".argos
+                
+                for i in $(seq 1 1 30)
+                do
+                    qsub run.sh "$version"NG_s"$swarm"_a"$a"_b"$b" $i
+                done
                                 
                 b="$((b+1))"
             done
@@ -30,4 +34,4 @@ do
     done
 done
 
-rm -f tmp*
+#rm -f tmp*

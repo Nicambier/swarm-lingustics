@@ -20,8 +20,8 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_aggregation_nNG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
+    <footbot_aggregation_wNG_controller id="fdc"
+                                  library="../build/controllers/footbot_aggregation_wNG/libfootbot_aggregation_wNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
@@ -31,7 +31,7 @@
         <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
       </sensors>
       <params minDist="70" aParam="2.6" bParam="2.2" leaveTurns="1" stayTurns="1" walkTurns="1" rule="2" />
-    </footbot_aggregation_nNG_controller>
+    </footbot_aggregation_wNG_controller>
 
   </controllers>
 
@@ -44,7 +44,7 @@
     <distribute>
       <position method="uniform" min="-7,-7,0" max="7,7,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="30" max_trials="100"> 
+      <entity quantity="100" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="fdc" />
