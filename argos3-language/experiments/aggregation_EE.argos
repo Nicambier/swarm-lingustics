@@ -5,33 +5,33 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="1" />
-    <experiment length="2000"
+    <system threads="8" />
+    <experiment length="3000"
                 ticks_per_second="10"/>
   </framework>
   
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="results/nNG_s200_a3_b2/1.txt" />
+  <loop_functions library="../build/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" output="test.txt" words="word" minDist="70" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
   <!-- *************** -->
   <controllers>
 
-    <footbot_aggregation_nNG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
+    <footbot_aggregation_cNG_controller id="fdc"
+                                  library="../build/controllers/footbot_aggregation_cNG/libfootbot_aggregation_cNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
       </actuators>
       <sensors>
         <footbot_proximity implementation="default" show_rays="false" />
-        <range_and_bearing implementation="medium" medium="rab" show_rays="true" />
+        <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
       </sensors>
-      <params minDist="70" aParam="1.5" bParam="2.3" leaveTurns="1" stayTurns="1" walkTurns="1" rule="2" />
-    </footbot_aggregation_nNG_controller>
+      <params minDist="70" aParam="3.5" bParam="4.5" leaveTurns="1" stayTurns="1" walkTurns="1" rule="3" noise="0.01" ntype="shannon" fitness="false" />
+    </footbot_aggregation_cNG_controller>
 
   </controllers>
 
@@ -44,7 +44,7 @@
     <distribute>
       <position method="uniform" min="-7,-7,0" max="7,7,0" /> 
       <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" /> 
-      <entity quantity="200" max_trials="100"> 
+      <entity quantity="100" max_trials="100"> 
         <foot-bot id="fb" 
                   rab_range = "1">
           <controller config="fdc" />
@@ -71,5 +71,17 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
+  <!--visualization>      
+    <qt-opengl lua_editor="false">
+      <user_functions library="../build/loop_functions/word_loop_functions/libword_loop_functions"
+                      label="word_qtuser_functions" />
+      <camera>
+        <placement idx="0" position="-0.00569879,0.01,7" look_at="-0.00569879,0.01,3.86243" lens_focal_length="10" />
+        <placement idx="1" position="-2,0,2" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="2" position="0.884183,0.359128,0.490269" look_at="0.924486,-0.486744,-0.0415919" lens_focal_length="20" />
+      </camera>
+    </qt-opengl>
+
+  </visualization-->
 
 </argos-configuration>

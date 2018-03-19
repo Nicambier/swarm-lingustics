@@ -37,7 +37,6 @@ void CFootBotAggregation_NG::speak(bool activate, int channel) {
 
 bool CFootBotAggregation_NG::hear(unsigned short int w) {
     bool inside = false;
-
     if(w > 0) {
         for (vector<unsigned short int>::iterator it = lexicon.begin() ; it != lexicon.end() && !inside; ++it) {
             if(w == *it) {

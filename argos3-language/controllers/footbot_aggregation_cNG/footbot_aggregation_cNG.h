@@ -2,9 +2,14 @@
 #define FOOTBOT_AGGREGATION_cNG_H
 
 #include "../footbot_aggregation_NG/footbot_aggregation_NG.h"
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <math.h>
+
+#include "argos3/core/utility/logging/argos_log.h"
+//#include <bitset>
 
 
 /*
@@ -37,6 +42,8 @@ public:
    
    virtual float ComputeProba(unsigned int n);
    
+   virtual unsigned short int Noise(unsigned short int w);
+   
    virtual string text();
    
    //virtual void Stay();
@@ -60,8 +67,9 @@ public:
    virtual void Destroy() {}
    
 private:
-
-
+    double noise;
+    bool fitness;
+    string ntype;
 };
 
 #endif

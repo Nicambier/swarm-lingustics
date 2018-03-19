@@ -72,12 +72,14 @@ void CFootBotAggregation::Init(TConfigurationNode& t_node) {
    m_fDelta = 0.5;
    m_fWheelVelocity = 10;
    GetNodeAttributeOrDefault(t_node, "minDist", minDist, minDist);
-   GetNodeAttributeOrDefault(t_node, "aParam", a, a);
-   GetNodeAttributeOrDefault(t_node, "bParam", b, b);
    GetNodeAttributeOrDefault(t_node, "leaveTurns", m_fLeaveTurns, m_fLeaveTurns);
    GetNodeAttributeOrDefault(t_node, "stayTurns", m_fStayTurns, m_fStayTurns);
    GetNodeAttributeOrDefault(t_node, "walkTurns", m_fWalkTurns, m_fWalkTurns);
    GetNodeAttributeOrDefault(t_node, "rule", probaRule, probaRule);
+   
+   GetNodeAttributeOrDefault(t_node, "aParam", a, a);
+   if(probaRule>=2)
+        GetNodeAttributeOrDefault(t_node, "bParam", b, b);
    
    /* Create a random number generator. We use the 'argos' category so
       that creation, reset, seeding and cleanup are managed by ARGoS. */
@@ -144,7 +146,7 @@ void CFootBotAggregation::Move() {
 }
 
 void CFootBotAggregation::ChangeState(unsigned short int newState) {
-    if(probaRule==2) {
+    if(probaRule>1) {
         if(newState==STATE_LEAVE)
             newState = STATE_WALK;
     }
@@ -188,26 +190,22 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
             switch(state) {
                 case STATE_WALK: //P_join
                     return 0.05+0.45*(1-exp(-a*n));
-                    //return 0.03+0.48*(1-exp(-a*n));
                     break;
                 case STATE_STAY: //1-P_leave
                     return 1-0.75*exp(-b*n);
-                    //return 1-exp(-b*n);
                     break;
             }
             break;
-        case 3: //correll and martinolli
-            --n; //don't count the bot itself
-            float pJoin[5] = {0.03,0.42,0.5,0.51,0.51};
-            float pLeave[5] = {1,0.02,0.00236,0.0014,0.000766};
-            if(n>4)
-                n=4;
+        case 3: //functions v1
+            --n;
             switch(state) {
-                case STATE_WALK:
-                    return pJoin[n];
+                case STATE_WALK: //P_join
+                    //return 0.05+0.45*(1-exp(-a*n));
+                    return 0.03+0.48*(1-exp(-a*n));
                     break;
-                case STATE_STAY:
-                    return 1-pLeave[n];
+                case STATE_STAY: //1-P_leave
+                    //return 1-0.75*exp(-b*n);
+                    return 1-exp(-b*n);
                     break;
             }
             break;

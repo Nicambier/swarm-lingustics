@@ -76,11 +76,13 @@ private:   /**
     * The path of the output file.
     */
    std::string m_strOutFile;
+   std::string m_strWordFile;
 
    /**
     * The stream associated to the output file.
     */
    std::ofstream m_cOutFile;
+   std::ofstream m_cWordFile;
 
    /**
     * This vector contains a list of positions of objects in the construction area

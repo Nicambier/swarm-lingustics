@@ -27,6 +27,7 @@ CAggregation::~CAggregation() {
 void CAggregation::Init(TConfigurationNode& t_tree) {
    /* Get output file name from XML tree */
    GetNodeAttribute(t_tree, "output", m_strOutFile);
+   GetNodeAttribute(t_tree, "words", m_strWordFile);
    
    GetNodeAttributeOrDefault(t_tree, "minDist", minDist, minDist);
    GetNodeAttributeOrDefault(t_tree, "timeStopCond", timeStopCond, timeStopCond);
@@ -35,6 +36,12 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
+   }
+   
+   /* Open the file for words writing */
+   m_cWordFile.open(m_strWordFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+   if(m_cWordFile.fail()) {
+      THROW_ARGOSEXCEPTION("Error opening file \"" << m_strWordFile << "\": " << ::strerror(errno));
    }
    
    ////////////////////////////////////////////////////////////////////////////////// CREATION AND POSITIONING OF THE ARENA WALLS////////////////////////////////////////////////////////////////////////////////
@@ -71,6 +78,17 @@ void CAggregation::Reset() {
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
    }
+   
+   /* Close the output file */
+   m_cWordFile.close();
+   if(m_cWordFile.fail()) {
+      THROW_ARGOSEXCEPTION("Error closing file \"" << m_strWordFile << "\": " << ::strerror(errno));
+   }
+   /* Open the file for text writing */
+   m_cWordFile.open(m_strWordFile.c_str(), std::ofstream::out | std::ofstream::trunc);
+   if(m_cWordFile.fail()) {
+      THROW_ARGOSEXCEPTION("Error opening file \"" << m_strWordFile << "\": " << ::strerror(errno));
+   }
 }
 
 /****************************************/
@@ -81,6 +99,11 @@ void CAggregation::Destroy() {
    m_cOutFile.close();
    if(m_cOutFile.fail()) {
       THROW_ARGOSEXCEPTION("Error closing file \"" << m_strOutFile << "\": " << ::strerror(errno));
+   }
+   
+   m_cWordFile.close();
+   if(m_cWordFile.fail()) {
+      THROW_ARGOSEXCEPTION("Error closing file \"" << m_strWordFile << "\": " << ::strerror(errno));
    }
 }
 
@@ -174,6 +197,7 @@ void CAggregation::PostStep() {
         set<unsigned short int> words;
         vector<unsigned short int> lexi;
         m_cOutFile << clock << "\t";
+        m_cWordFile << clock << "\t";
         CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
         for(CSpace::TMapPerType::iterator it = cFBMap.begin(); it != cFBMap.end(); ++it) {
             CFootBotEntity& footbotEntity = *any_cast<CFootBotEntity*>(it->second);
@@ -184,8 +208,10 @@ void CAggregation::PostStep() {
                 Real Robot_Y = footbotEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetY();
                 positions.push_back(make_pair(Robot_X,Robot_Y));
                 lexi = controller.GetLexicon();
-                for(int i=0; i<lexi.size(); ++i)
+                for(int i=0; i<lexi.size(); ++i) {
                     words.insert(lexi[i]);
+                    m_cWordFile<<" "<<lexi[i];
+                }
             //}
         }
         vector<int> sizes;
@@ -203,7 +229,9 @@ void CAggregation::PostStep() {
         m_cOutFile<<connectivity(positions)<<" "<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb<<" "<<stdAcc/nb;
         for(int i=0; i<nb; ++i)
             m_cOutFile<<" "<<sizes[i];
+        
         m_cOutFile<<endl;
+        m_cWordFile<<endl;
     }
 }
 
