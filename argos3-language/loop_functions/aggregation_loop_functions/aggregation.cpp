@@ -7,6 +7,7 @@
 /****************************************/
 
 static const Real BOT_RADIUS            = 0.14f;
+static const UInt32 MAX_PLACE_TRIALS = 20;
 
 /****************************************/
 /****************************************/
@@ -31,6 +32,9 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    
    GetNodeAttributeOrDefault(t_tree, "minDist", minDist, minDist);
    GetNodeAttributeOrDefault(t_tree, "timeStopCond", timeStopCond, timeStopCond);
+   
+   int nBots;
+   GetNodeAttributeOrDefault(t_tree, "nBots", nBots, nBots);
 
    /* Open the file for text writing */
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -61,6 +65,36 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
         
         CBoxEntity* box = new CBoxEntity(entity_id.str(), wall_position, wall_orientation, false, wall_size, (Real)1.0 );
         AddEntity( *box );
+    }
+    
+    CVector3 cPosition;
+    CQuaternion cOrientation;
+    cPosition.SetZ(0.0);
+    CRandom::CRNG* m_pcRNG = CRandom::CreateRNG("argos");
+    CFootBotEntity* pcFB;
+    int unTrials;
+    for(int i=0; i<nBots; ++i) {
+        bool bDone = false;
+        unTrials = 0;
+        
+        pcFB = new CFootBotEntity("fb_" + ToString(i),"fdc");
+        AddEntity(*pcFB);
+        do {
+            CRadians cRandomAngle = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
+            Real cRandomRadius = m_pcRNG->Uniform(CRange<int>(-m_fArenaRadius,m_fArenaRadius));
+
+            cPosition.SetX(cRandomRadius * Cos(cRandomAngle));
+            cPosition.SetY(cRandomRadius * Sin(cRandomAngle));
+
+            CRadians cRandomOrientation = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
+            cOrientation.FromEulerAngles(cRandomOrientation, CRadians::ZERO, CRadians::ZERO);
+
+            bDone = MoveEntity(pcFB->GetEmbodiedEntity(), cPosition, cOrientation);
+            ++unTrials;
+        } while(!bDone && unTrials <= MAX_PLACE_TRIALS);
+        if(!bDone) {
+            THROW_ARGOSEXCEPTION("Can't place " << "fb_" + ToString(i));
+        }
     }
 }
 

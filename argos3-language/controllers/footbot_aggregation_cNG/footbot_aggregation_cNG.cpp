@@ -68,8 +68,8 @@ float CFootBotAggregation_cNG::ComputeProba(unsigned int n) {
             a = 0;
             b = 0;
         } else {
-            a = 1+0.25*(w%16);
-            b = 1+0.25*(w/16);
+            a = 1.25+0.25*(w%16);
+            b = 1.25+0.25*(w/16);
         }
     }
     //cout << w << " " << a << " " << b << " " << endl;

@@ -1,38 +1,58 @@
 #!/bin/bash
     
 FILE='aggregation_EE.argos'
-FOLDER='EmbEvo_random'
-mkdir $FOLDER
-    
-for swarm in 100
+FOLDER='EmbEvo_tests'
+mkdir -p $FOLDER
+
+for version in 'n'
 do
-    sed -e 's/<entity quantity=".*" max_trials="100">/<entity quantity="'"$swarm"'" max_trials="100">/' $FILE > tmp1
-    sleep 0.1 
-    for ntype in 'shannon'
+    sed -e 's/library="..\/build\/controllers\/[^\"]*"/library="..\/build\/controllers\/footbot_aggregation_'"$version"'NG\/libfootbot_aggregation_'"$version"'NG.so"/' $FILE > tmp1
+    sed -e 's/footbot_aggregation.*controller/footbot_aggregation_'"$version"'NG_controller/' tmp1 > tmp2
+    
+    for swarm in 100
     do
-        mkdir $FOLDER/$ntype
-        n=1
-        for noise in 0.008
+        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp2 > tmp3
+        if [ $swarm -eq 25 ] 
+        then 
+            sed -e 's/arena size="20, 20, 1"/arena size="10, 10, 1"/' tmp3 > tmp4
+            sed -e 's/aParam="1" bParam="2" leave/aParam="2.25" bParam="3.5" leave/' tmp4 > tmp5
+        fi
+        if [ $swarm -eq 50 ]
+        then 
+            sed -e 's/arena size="20, 20, 1"/arena size="14, 14, 1"/' tmp3 > tmp4
+            sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="2" leave/' tmp4 > tmp5
+        fi
+        if [ $swarm -eq 100 ]
+        then 
+            sed -e 's/arena size="20, 20, 1"/arena size="20, 20, 1"/' tmp3 > tmp4
+            sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="1.25" leave/' tmp4 > tmp5
+        fi
+        sleep 0.1 
+        a=1
+        for aParam in 1
         do
-            sed -e 's/noise=".*" ntype=".*" fitness/noise="'"$noise"'" ntype="'"$ntype"'" fitness/' tmp1 > tmp2
-            sleep 0.1 
-            for i in $(seq 1 1 20)
+            sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp5 > tmpa
+            b='a'
+            for bParam in 1
             do
-                a="$( (seq 1.5 0.25 5) | shuf -n1)"
-                b="$( (seq 1.5 0.25 5) | shuf -n1)"
-                sed -e 's/aParam=".*" bParam=".*" leave/aParam="'"$a"'" bParam="'"$b"'" leave/' tmp2 > tmp3
-                echo $a
-                echo $b
-                sleep 0.1
-                sed -e 's/output=".*" words=".*" min/output="'"$FOLDER\/$ntype"'\/out_n'"$n"'_'"$i"'" words="'"$FOLDER\/$ntype"'\/words_n'"$n"'_'"$i"'" min/' tmp2 > tmp.argos
-                sleep 1
-                while [ "$(pgrep -c argos3)" -gt 6 ] 
+                sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmpa > tmpb
+                sleep 0.1 
+                DIREC=$FOLDER/$version'NG_s'$swarm'_a'$a'_b'$b
+                mkdir -p $DIREC
+                for i in $(seq 1 1 1)
                 do
                     sleep 1
+                    sed -e 's/output=".*" words=".*" min/output="'"$FOLDER\/$version"'NG_s'"$swarm"'_a'"$a"'_b'"$b"'\/out_n1_'"$i"'" words="'"$FOLDER\/$version"'NG_s'"$swarm"'_a'"$a"'_b'"$b"'\/words_n1_'"$i"'" min/' tmpb > tmp.argos
+                    sleep 1
+                    while [ "$(pgrep -c argos3)" -gt 5 ] 
+                    do
+                        sleep 1
+                    done
+                    argos3 -c  tmp.argos &
                 done
-                argos3 -c  tmp.argos &
+                #b="$((b+1))"
             done
-            n="$((n+1))"
+            a="$((a+1))"
         done
     done
 done
