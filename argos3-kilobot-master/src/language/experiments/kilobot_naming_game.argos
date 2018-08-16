@@ -6,10 +6,15 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="1000"
+    <experiment length="0"
                 ticks_per_second="10"
-                random_seed="124" />
+                random_seed="0" />
   </framework>
+  
+  <!-- ****************** -->
+  <!-- * Loop functions * -->
+  <!-- ****************** -->
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="50" output="test.txt" words="word" minDist="7" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -23,10 +28,10 @@
         <kilobot_communication implementation="default" />
       </actuators>
       <sensors>
-        <kilobot_communication implementation="default" medium="kilocomm" show_rays="false" />
+        <kilobot_communication implementation="default" medium="kilocomm" show_rays="true" />
         <kilobot_light implementation="rot_z_only" />
       </sensors>
-      <params behavior="build/examples/behaviors/naming_game" />
+      <params behavior="build/language/behaviors/NG_agg" />
     </kilobot_controller>
 
   </controllers>
@@ -35,19 +40,7 @@
   <!-- * Arena configuration * -->
   <!-- *********************** -->
   <arena size="1, 1, 1" center="0,0,0.5">
-    <box id="bn" size="0.01, 1, 0.2" movable="false">
-      <body position="0.5,0,0"  orientation="0,0,0" />
-    </box>
-    <box id="bs" size="0.01, 1, 0.2" movable="false">
-      <body position="-0.5,0,0" orientation="0,0,0" />
-    </box>
-    <box id="be" size="1, 0.01, 0.2" movable="false">
-      <body position="0,-0.5,0" orientation="0,0,0" />
-    </box>
-    <box id="bw" size="1, 0.01, 0.2" movable="false">
-      <body position="0,0.5,0" orientation="0,0,0" />
-    </box>
-    
+      
     <light id="l0"
            position="0,0,0.95"
            orientation="0,0,0"
@@ -55,17 +48,6 @@
            intensity="1.0"
            medium="leds"/>
            
-    
-
-    <distribute>
-      <position method="uniform" min="-0.5,-0.5,0" max="0.5,0.5,0" />
-      <orientation method="gaussian" mean="0,0,0" std_dev="360,0,0" />
-      <entity quantity="40" max_trials="100">
-        <kilobot id="kb">
-          <controller config="kbc" />>
-        </kilobot>
-      </entity>
-    </distribute>
 
   </arena>
 
@@ -87,12 +69,13 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!--visualization>
+  <visualization>
     <qt-opengl>
+      <user_functions library="build/language/loop_functions/word_loop_functions/libword_loop_functions" label="word_qtuser_functions" />
       <camera>
         <placement idx="0" position="0,0,0.5" look_at="0,0,0" lens_focal_length="13" />
       </camera>
     </qt-opengl>
-  </visualization-->
+  </visualization>
 
 </argos-configuration>

@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <ctype.h>
+#include <time.h>
 
 
 /* Kilolib original variables */
@@ -101,7 +102,8 @@ void delay(uint16_t ms) {
 }
 
 uint8_t rand_hard() {
-   return rand_soft();
+   srand((unsigned int)time(NULL)*kilo_uid);
+   return rand() % 256;
 }
 
 uint8_t rand_soft() {

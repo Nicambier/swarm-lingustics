@@ -21,7 +21,7 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
 Then set the environment variable ARGOS_PLUGIN_PATH to the full path in which the build/ directory is located: 
-export ARGOS_PLUGIN_PATH=/path/to/swarm-linguistics/lua/cpp/build/
+export ARGOS_PLUGIN_PATH=/path/to/swarm-lingustics/lua/cpp/build/
 
 You can then try any experiment with:
 argos3 -c experiment.argos (must be typed directly from the folder containing the experiment)
@@ -30,7 +30,7 @@ argos3 -c experiment.argos (must be typed directly from the folder containing th
 
 
 To test the naming game with kilobots, first type
-export ARGOS_PLUGIN_PATH=/path/to/swarm-linguistics/argos3-kilobot-master/build/plugins/robots/kilobot
+export ARGOS_PLUGIN_PATH=/path/to/swarm-lingustics/argos3-kilobot-master/build/plugins/robots/kilobot
 you can then try the naming game from the kilobot folder by typing:
 cd argos3-kilobot-master
 argos3 -c src/examples/experiments/kilobot_naming_game.argos

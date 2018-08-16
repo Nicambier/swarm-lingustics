@@ -4,16 +4,24 @@
 namespace argos {
    class CKilobotCommunicationMedium;
    class CKilobotCommunicationEntity;
+   class CKilobotEntity;
 }
 
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/simulator/medium/medium.h>
 #include <argos3/core/simulator/space/positional_indices/positional_index.h>
 #include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_entity.h>
+#include <unordered_map>
+
 
 namespace argos {
 
    class CKilobotCommunicationMedium : public CMedium {
+
+   public:
+
+      /** Defines the adjacency matrix */
+      typedef unordered_map<ssize_t, CSet<CKilobotCommunicationEntity*, SEntityComparator> > TAdjacencyMatrix;
 
    public:
 
@@ -51,12 +59,45 @@ namespace argos {
        * @return An immutable vector of entities that can communicate with the given entity.       
        * @throws CARGoSException If the passed entity is not managed by this medium.
        */
-      const CSet<CKilobotCommunicationEntity*>& GetKilobotsCommunicatingWith(CKilobotCommunicationEntity& c_entity) const;
+      const CSet<CKilobotCommunicationEntity*,SEntityComparator>& GetKilobotsCommunicatingWith(CKilobotCommunicationEntity& c_entity) const;
+
+      /**
+       * Returns a reference to the adjacency matrix.
+       * @return A reference to the adjacency matrix.
+       */
+      TAdjacencyMatrix& GetCommMatrix(){
+          return m_tCommMatrix;
+      }
+
+      /**
+       * Sends a message to the given robot, as if it were done by the overhead controller.
+       * Only one message per time step can be set.
+       * Once set, a message stays until explicitly erased.
+       * To erase a message, set it to NULL.
+       * @param c_robot The message recipient.
+       * @param pt_message The message payload.
+       */
+      void SendOHCMessageTo(CKilobotEntity& c_robot,
+                            message_t* pt_message);
+
+      /**
+       * Sends a message to the given robots, as if it were done by the overhead controller.
+       * Only one message per time step can be set.
+       * Once set, a message stays until explicitly erased.
+       * To erase a message, set it to NULL.
+       * @param vec_robots The message recipients.
+       * @param pt_message The message payload.
+       */
+      void SendOHCMessageTo(std::vector<CKilobotEntity*>& vec_robots,
+                            message_t* Message);
+
+      /**
+       * Returns the OHC message for the given Kilobot.
+       * @returns the OHC message payload (or NULL if no message is associated to the given robot)
+       */
+      message_t* GetOHCMessageFor(CKilobotEntity& c_robot);
 
    private:
-
-      /** Defines the adjacency matrix */
-      typedef std::map<CKilobotCommunicationEntity*, CSet<CKilobotCommunicationEntity*> > TAdjacencyMatrix;
 
       /** The adjacency matrix, that associates each entity with the entities that communicate with it */
       TAdjacencyMatrix m_tCommMatrix;
@@ -70,11 +111,17 @@ namespace argos {
       /** The update operation for the grid positional index */
       CKilobotCommunicationEntityGridEntityUpdater* m_pcGridUpdateOperation;
 
+      /** A list of messages set through SendOHCMessageTo() */
+      std::unordered_map<ssize_t, message_t*> m_mapOHCMessages;
+
       /** Random number generator */
       CRandom::CRNG* m_pcRNG;
 
       /** Probability of receiving a message */
       Real m_fRxProb;
+
+      /** Whether to ignore communication conflicts due to channel congestion */
+      bool m_bIgnoreConflicts;
 
    };
 
