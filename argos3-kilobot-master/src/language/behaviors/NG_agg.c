@@ -5,7 +5,8 @@
 #include <stdlib.h>
 
 #define COMPLETE_TURN 53
-#define SIGMA 20
+#define SIGMA 50
+#define HEAR_TIME 8
 
 int next_turn, turn_turn;
 char walk;
@@ -13,12 +14,14 @@ char walk;
 message_t message;
 unsigned char sending_turn;
 float a,b;
-double m = 0.005;
+double m = 0.01;
 
 unsigned char inventory[100];
 unsigned char ids[100];
 message_t* msgs[100];
 int inventory_size, msgs_size, n;
+
+float closest;
 
 double rayleigh()
 {
@@ -29,6 +32,7 @@ double rayleigh()
         res = SIGMA * sqrt(-2 * log(u));
     }
     return res;
+    //return 100;
 }
 
 int random_turn()
@@ -59,6 +63,7 @@ void setup()
     walk = 1;
     next_turn=rayleigh();
     turn_turn=100; //flag value
+    closest = -1;
 }
 
 void speak(char activate) 
@@ -78,6 +83,7 @@ void speak(char activate)
             // It's important that the CRC is computed after the data has been set;
             // otherwise it would be wrong and the message would be dropped by the
             // receiver.
+            message.data[2] = n;
             message.crc = message_crc(&message);
         }
         sending_turn=1;
@@ -119,7 +125,7 @@ short int alreadyReceived(unsigned char* ids, unsigned char id, int ids_size)
 void hear()
 {
     int i;
-    if(kilo_ticks%8==0) { //else we keep the same value for n
+    if(kilo_ticks%HEAR_TIME==0) { //else we keep the same value for n
         n=0;
         unsigned char neigh_ids[20];
         short int nSize = 0;
@@ -146,7 +152,7 @@ void hear()
                 }
             }
         }
-        n = msgs_size; //temp -> this line erases previous operation in order to perform regular aggregation
+        //n = msgs_size; //temp -> this line erases previous operation in order to perform regular aggregation
         msgs_size = 0; //delete messages;
     }
 }
@@ -181,23 +187,24 @@ void loop()
         }
         else {
             spinup_motors(); // Spinup the motors to overcome friction.
-            set_motors(kilo_straight_left, kilo_straight_right);
+            set_motors(kilo_straight_left, kilo_straight_right);}
+    
+        //NAMING GAME
+        hear();
+        speak(0);
         
-            //NAMING GAME
-            hear();
-            speak(0);
-            
-            //TRANSITION
-            a = 1.7;
-            /*if(inventory_size==1) {
-                a = 1.25+0.25*(inventory[0]>>4);
-            }*/
-            float p = 0.03+0.48*(1-exp(-a*n));
-            float r = (float) rand_soft()/(float) 255;
-            if(r < p) {
-                walk = 0;
-            }
+        //TRANSITION
+        a = 0;//1.7;
+        if(inventory_size==1) {
+            a = 1.25+0.25*(inventory[0]>>4);
         }
+        float p = 0.03+0.48*(1-exp(-a*n));
+        float r = (float) rand_soft()/(float) 255;
+        if(kilo_ticks%HEAR_TIME==0 && r < p) {
+            walk = 0;
+        }
+        
+
     }
     else//STAY
     {
@@ -211,13 +218,13 @@ void loop()
             
         
         //TRANSITION
-        b = 3.9;
-        /*if(inventory_size==1) {
+        b = 0;//3.9;
+        if(inventory_size==1) {
             b = 1.25+0.25*(inventory[0]&(unsigned char) 15);
-        }*/
+        }
         float p = exp(-b*n);
         float r = (float) rand_soft()/(float) 255;
-        if(r < p) {
+        if(kilo_ticks%HEAR_TIME==0 && r < p) {
             walk = 1;
             //if(next_turn>0) //forces to turn if the bot is not already turning to leave
             //    next_turn = 0;
@@ -240,6 +247,16 @@ void message_rx(message_t *m, distance_measurement_t *d)
         ids[msgs_size]=m->data[1];
         ++msgs_size;
     }
+    /*float dist = estimate_distance(d);
+    if(closest==-1)
+        closest = dist;
+    if(dist < closest) {
+        closest = dist;
+        if(next_turn>0) {
+            next_turn=1;
+            closest = -1;
+        }
+    }*/
 }
 
 int main()

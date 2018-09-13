@@ -1,13 +1,12 @@
 #
 # Set minimum required version
 #
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.0.2)
 
 #
 # Deactivate RPATH for MacOSX
 #
 set(CMAKE_MACOSX_RPATH 0)
-
 
 #
 # Set the path additional cmake files must be searched for
@@ -58,6 +57,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/ARGoSPackaging.cmake)
 #
 # Compile stuff
 #
+add_subdirectory(language)
 add_subdirectory(plugins)
 add_subdirectory(examples)
-add_subdirectory(language)

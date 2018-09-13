@@ -5,7 +5,7 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="0" />
+    <system threads="7" />
     <experiment length="0"
                 ticks_per_second="10"
                 random_seed="0" />
@@ -14,7 +14,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="50" output="test.txt" words="word" minDist="7" timeStopCond="0" />
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="100" output="test.txt" words="word" minDist="7" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -53,7 +53,7 @@
 
   <!-- ******************* -->
   <!-- * Physics engines * -->
-  <!-- ******************* -->
+  <!-- ******************* -->s
   <physics_engines>
     <dynamics2d id="dyn2d" />
   </physics_engines>

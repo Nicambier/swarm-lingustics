@@ -1,4 +1,5 @@
 #include "kilobot_communication_default_sensor.h"
+#include "kilobot_entity.h"
 #include "kilobot_communication_entity.h"
 #include "kilobot_communication_medium.h"
 #include <argos3/core/simulator/simulator.h>
@@ -11,7 +12,10 @@ namespace argos {
    /****************************************/
 
    CKilobotCommunicationDefaultSensor::CKilobotCommunicationDefaultSensor() :
+      m_pcRobot(NULL),
       m_pcCommEntity(NULL),
+      m_pcMedium(NULL),
+      m_pcControllableEntity(NULL),
       m_fDistanceNoiseStdDev(0.0f),
       m_pcRNG(NULL),
       m_cSpace(CSimulator::GetInstance().GetSpace()),
@@ -21,10 +25,10 @@ namespace argos {
    /****************************************/
 
    void CKilobotCommunicationDefaultSensor::SetRobot(CComposableEntity& c_entity) {
+      /* Assign Kilobot entity to this sensor */
+      m_pcRobot = dynamic_cast<CKilobotEntity*>(&c_entity);
       /* Assign Kilobot communication entity to this sensor */
       m_pcCommEntity = &c_entity.GetComponent<CKilobotCommunicationEntity>("kilocomm");
-      /* Enable the Kilobot communication entity */
-      m_pcCommEntity->Enable();
       /* Get reference to controllable entity */
       m_pcControllableEntity = &c_entity.GetComponent<CControllableEntity>("controller");
    }
@@ -46,8 +50,9 @@ namespace argos {
          std::string strMedium;
          GetNodeAttribute(t_tree, "medium", strMedium);
          m_pcMedium = &(CSimulator::GetInstance().GetMedium<CKilobotCommunicationMedium>(strMedium));
-         /* Assign Kilobot communication entity to the medium */
-         m_pcMedium->AddEntity(*m_pcCommEntity);
+         /* Enable the Kilobot communication entity */
+         m_pcCommEntity->SetMedium(*m_pcMedium);
+         m_pcCommEntity->Enable();
       }
       catch(CARGoSException& ex) {
          THROW_ARGOSEXCEPTION_NESTED("Error initializing the Kilobot communication medium sensor", ex);
@@ -58,18 +63,38 @@ namespace argos {
    /****************************************/
 
    void CKilobotCommunicationDefaultSensor::Update() {
+      /*
+       * Variable definitions
+       */
+      /* Buffer for the received packet */
+      CCI_KilobotCommunicationSensor::SPacket sPacket;
+      /*
+       * Housekeeping
+       */
+      /* Buffer for calculating the message--robot distance */
+      CVector3 cVectorRobotToMessage;
       /* Update status of last delivery */
       m_bMessageSent = (m_pcCommEntity->GetTxStatus() == CKilobotCommunicationEntity::TX_SUCCESS);
       /* Delete old readings */
       m_tPackets.clear();
+      /*
+       * OHC message processing
+       */
+      /* Get OHC message, if any */
+      message_t* ptOHCMsg = m_pcMedium->GetOHCMessageFor(*m_pcRobot);
+      if(ptOHCMsg != NULL) {
+         sPacket.Message = ptOHCMsg;
+         sPacket.Distance.low_gain = 0;
+         sPacket.Distance.high_gain = 0;
+         m_tPackets.push_back(sPacket);
+      }
+      /*
+       * Kilobot messages
+       */
       /* Get list of communicating RABs */
-      const CSet<CKilobotCommunicationEntity*>& setComms = m_pcMedium->GetKilobotsCommunicatingWith(*m_pcCommEntity);
-      /* Buffer for calculating the message--robot distance */
-      CVector3 cVectorRobotToMessage;
-      /* Buffer for the received packet */
-      CCI_KilobotCommunicationSensor::SPacket sPacket;
+      const CSet<CKilobotCommunicationEntity*,SEntityComparator>& setComms = m_pcMedium->GetKilobotsCommunicatingWith(*m_pcCommEntity);
       /* Go through communicating RABs and create packets */
-      for(CSet<CKilobotCommunicationEntity*>::iterator it = setComms.begin();
+      for(CSet<CKilobotCommunicationEntity*,SEntityComparator>::iterator it = setComms.begin();
           it != setComms.end(); ++it) {
          /* Create a reference to the Kilobot communication entity to process */
          CKilobotCommunicationEntity& cOtherCommEntity = **it;
@@ -104,7 +129,7 @@ namespace argos {
    /****************************************/
 
    void CKilobotCommunicationDefaultSensor::Destroy() {
-      m_pcMedium->RemoveEntity(*m_pcCommEntity);
+      m_pcCommEntity->Disable();
    }
 
    /****************************************/

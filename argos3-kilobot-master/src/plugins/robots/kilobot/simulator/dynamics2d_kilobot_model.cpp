@@ -14,8 +14,9 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   static const Real KILOBOT_MAX_FORCE                = 0.001f;
-   static const Real KILOBOT_MAX_TORQUE               = 0.001f;
+   static const Real KILOBOT_MAX_FORCE  = 0.001f;
+   static const Real KILOBOT_MAX_TORQUE = 0.001f;
+   static const Real KILOBOT_FRICTION   = 2.5f;
 
    enum KILOBOT_WHEELS {
       KILOBOT_LEFT_WHEEL = 0,
@@ -33,8 +34,16 @@ namespace argos {
       m_cDiffSteering(c_engine,
                       KILOBOT_MAX_FORCE,
                       KILOBOT_MAX_TORQUE,
-                      KILOBOT_INTERPIN_DISTANCE),
+                      KILOBOT_INTERPIN_DISTANCE,
+                      c_entity.GetConfigurationNode()),
       m_fCurrentWheelVelocity(m_cWheeledEntity.GetWheelVelocities()) {
+      /* Parse the XML file to check if friction was specified */
+      cpFloat fFriction = KILOBOT_FRICTION;
+      if(c_entity.GetConfigurationNode() &&
+         NodeExists(*c_entity.GetConfigurationNode(), "dynamics2d")) {
+         TConfigurationNode& tDyn2D = GetNode(*c_entity.GetConfigurationNode(), "dynamics2d");
+         GetNodeAttributeOrDefault(tDyn2D, "friction", fFriction, fFriction);
+      }
       /* Create the actual body with initial position and orientation */
       cpBody* ptBody =
          cpSpaceAddBody(GetDynamics2DEngine().GetPhysicsSpace(),
@@ -54,8 +63,8 @@ namespace argos {
                          cpCircleShapeNew(ptBody,
                                           KILOBOT_RADIUS,
                                           cpv(KILOBOT_ECCENTRICITY,0)));
-      ptShape->e = 0.0; // No elasticity
-      ptShape->u = 0.7; // Lots of friction
+      ptShape->e = 0.0;       // No elasticity
+      ptShape->u = fFriction; // Friction
       /* Constrain the body to follow the diff steering control */
       m_cDiffSteering.AttachTo(ptBody);
       /* Set the body so that the default methods work as expected */

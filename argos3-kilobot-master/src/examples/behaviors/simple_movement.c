@@ -7,7 +7,7 @@ void setup()
 void loop()
 {
     // Set the LED green.
-    set_color(RGB(0, 0, 1));
+    set_color(RGB(0, 1, 0));
     // Spinup the motors to overcome friction.
     spinup_motors();
     // Move straight for 2 seconds (2000 ms).

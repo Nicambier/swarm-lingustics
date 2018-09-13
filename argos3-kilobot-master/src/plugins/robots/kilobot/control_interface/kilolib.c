@@ -2,23 +2,76 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <signal.h>
 #include <ctype.h>
-#include <time.h>
 
+/*
+ * Mersenne-Twister-related constants
+ *
+ * These variables and constants are used to implement the
+ * Mersenne-Twister random number generation algorithm. The algorithm
+ * is used in rand_hard().
+ */
+#define MT_N          624
+#define MT_M          397
+#define MT_MATRIX_A   0x9908b0dfUL /* constant vector a */
+#define MT_UPPER_MASK 0x80000000UL /* most significant w-r bits */
+#define MT_LOWER_MASK 0x7fffffffUL /* least significant r bits */
+#define MT_INT_MAX    0xFFFFFFFFUL
+int32_t* mt_rngstate; /* Random number generator state */
+uint32_t mt_rngidx;   /* Random number generator index */
+
+/* Sets the seed of a Mersenne-Twister random number generator */
+void mt_setseed(uint32_t seed) {
+   mt_rngstate[0] = seed & 0xffffffffUL;
+   for(mt_rngidx = 1; mt_rngidx < MT_N; ++mt_rngidx) {
+      mt_rngstate[mt_rngidx] =
+         (1812433253UL * (mt_rngstate[mt_rngidx-1] ^ (mt_rngstate[mt_rngidx-1] >> 30)) + mt_rngidx);
+      mt_rngstate[mt_rngidx] &= 0xffffffffUL;
+   }
+}
+
+/* Return a random number on 32 bits */
+uint32_t mt_uniform32() {
+   uint32_t y;
+   static uint32_t mag01[2] = { 0x0UL, MT_MATRIX_A };
+   /* mag01[x] = x * MT_MATRIX_A  for x=0,1 */
+   if (mt_rngidx >= MT_N) { /* generate N words at one time */
+      int32_t kk;
+      for (kk = 0; kk < MT_N - MT_M; ++kk) {
+         y = (mt_rngstate[kk] & MT_UPPER_MASK) | (mt_rngstate[kk+1] & MT_LOWER_MASK);
+         mt_rngstate[kk] = mt_rngstate[kk+MT_M] ^ (y >> 1) ^ mag01[y & 0x1UL];
+      }
+      for (; kk < MT_N - 1; ++kk) {
+         y = (mt_rngstate[kk] & MT_UPPER_MASK) | (mt_rngstate[kk+1] & MT_LOWER_MASK);
+         mt_rngstate[kk] = mt_rngstate[kk+(MT_M-MT_N)] ^ (y >> 1) ^ mag01[y & 0x1UL];
+      }
+      y = (mt_rngstate[MT_N-1] & MT_UPPER_MASK) | (mt_rngstate[0] & MT_LOWER_MASK);
+      mt_rngstate[MT_N-1] = mt_rngstate[MT_M-1] ^ (y >> 1) ^ mag01[y & 0x1UL];
+      mt_rngidx = 0;
+   }
+   y = mt_rngstate[mt_rngidx++];
+   /* Tempering */
+   y ^= (y >> 11);
+   y ^= (y << 7) & 0x9d2c5680UL;
+   y ^= (y << 15) & 0xefc60000UL;
+   y ^= (y >> 18);
+   return y;
+}
 
 /* Kilolib original variables */
-uint32_t kilo_ticks                = 0;
-uint16_t kilo_tx_period            = 100;
+uint32_t kilo_ticks                = 0;   // current number of elapsed ticks
+uint16_t kilo_tx_period            = 100; // message transmission period in ms
 uint16_t kilo_uid                  = 0;
-uint8_t  kilo_turn_left            = 255;
-uint8_t  kilo_turn_right           = 255;
-uint8_t  kilo_straight_left        = 255;
-uint8_t  kilo_straight_right       = 255;
+uint8_t  kilo_turn_left            = 77;
+uint8_t  kilo_turn_right           = 77;
+uint8_t  kilo_straight_left        = 48;
+uint8_t  kilo_straight_right       = 48;
 void message_rx_dummy(message_t* m, distance_measurement_t* d) { }
 message_t *message_tx_dummy() { return NULL; }
 void message_tx_success_dummy() {}
@@ -27,27 +80,29 @@ message_tx_t kilo_message_tx = message_tx_dummy;
 message_tx_success_t kilo_message_tx_success = message_tx_success_dummy;
 
 /* Variables necessary here */
-static uint32_t  argos_tick_length = 0;    // length of an argos tick in ms
-static uint32_t  kilo_tx_clock     = 0;    // message tx clock
-static uint32_t  kilo_delay        = 0;    // delay clock
+static float     kilo_ticks_delta  = 0.0f; // how much to increase the kilo_ticks every argos tick
+static float     kilo_ticks_frac   = 0;    // fractional part of kilo_ticks to account for non-integer delta
+static float     kilo_ms_delta     = 0.0f; // how much to decrease delay and tx clocks in ms
+static float     kilo_tx_clock     = 0.0f; // message transmission clock in ms
+static float     kilo_delay        = 0.0f; // delay clock in ms
 static uint8_t   kilo_seed         = 0xAA; // default random seed
 static uint8_t   kilo_accumulator  = 0;    // rng accumulator
-static char*     kilo_str_id       = NULL; // kilobot id as string
 static int       kilo_state_fd     = -1;   // shared memory file
 kilobot_state_t* kilo_state        = NULL; // shared robot state
+char*            kilo_str_id       = NULL; // kilobot id as string
 
 void preloop() {
    /* Update tick count */
-   // TODO: this is approximated, and works only if (argos_tick_length > TICKS_PER_SEC)
-   kilo_ticks += argos_tick_length / TICKS_PER_SEC;
+   kilo_ticks_frac += kilo_ticks_delta;
+   kilo_ticks += (uint32_t)kilo_ticks_frac;
    /* Message sent? */
    if(kilo_state->tx_state != 2) {
       /* No message sent */
-      kilo_tx_clock += argos_tick_length;
+      kilo_tx_clock += kilo_ms_delta;
    } else {
       /* Message sent */
       kilo_state->tx_state = 0;
-      kilo_tx_clock = 0;
+      kilo_tx_clock = 0.0f;
       kilo_message_tx_success();
    }
    /* Message received? */
@@ -58,6 +113,7 @@ void preloop() {
       }
       kilo_state->rx_state = 0;
    }
+   kilo_ticks_frac -= (uint32_t)kilo_ticks_frac;
 }
 
 void postloop() {
@@ -79,31 +135,30 @@ uint8_t estimate_distance(const distance_measurement_t* d) {
 
 void delay(uint16_t ms) {
    /* If the delay is shorter than the tick length, it's no delay at all */
-   if(ms < argos_tick_length) return;
+   if(ms < kilo_ms_delta) return;
    /* Set delay counter and wait */
    kilo_delay = ms;
    postloop();
-   while(kilo_delay > 0) {
+   while(kilo_delay > 0.0f) {
       /* Suspend process, waiting for ARGoS controller's resume signal */
       raise(SIGTSTP);
       /* Update state */
       preloop();
       /* Are we done waiting? */
-      if(kilo_delay > argos_tick_length) {
+      if(kilo_delay > kilo_ms_delta) {
          /* No, keep going */
-         kilo_delay -= argos_tick_length;
+         kilo_delay -= kilo_ms_delta;
          postloop();
       }
       else {
          /* Done waiting! */
-         kilo_delay = 0;
+         kilo_delay = 0.0f;
       }
    }
 }
 
 uint8_t rand_hard() {
-   srand((unsigned int)time(NULL)*kilo_uid);
-   return rand() % 256;
+   return mt_uniform32();
 }
 
 uint8_t rand_soft() {
@@ -143,7 +198,6 @@ void set_color(uint8_t color) {
 }
 
 void kilo_init() {
-   // Nothing to do
 }
 
 void cleanup() {
@@ -152,19 +206,20 @@ void cleanup() {
    shm_unlink(kilo_str_id);
 }
 
-void sigkill_handler(int s) {
+void sigterm_handler(int s) {
    cleanup();
+   exit(0);
 }
 
 void kilo_start(void (*setup)(void), void (*loop)(void)) {
-   /* Install handler for SIGKILL */
-   signal(SIGKILL, sigkill_handler);
+   /* Install handler for SIGTERM */
+   signal(SIGTERM, sigterm_handler);
    /* Execute setup() */
    setup();
    /* Continue working until killed by ARGoS controller */
    while(1) {
       /* Suspend yourself, waiting for ARGoS controller's resume signal */
-      raise(SIGTSTP);
+      raise(SIGSTOP);
       /* Resumed */
       /* Execute loop */
       preloop();
@@ -191,18 +246,25 @@ int __kilobot_main(int argc, char* argv[]);
 #undef main
 int main(int argc, char* argv[]) {
    /* Parse arguments */
-   if(argc != 3) {
+   if(argc != 5) {
       int i;
       fprintf(stderr, "Error: %s was given %d arguments\n", argv[0], argc);
       for(i = 0; i < argc; ++i) {
          fprintf(stderr, "\tARG %d: %s\n", i, argv[i]);
       }
-      fprintf(stderr, "Usage: <script> <robot_id> <tick_length>\n");
+      fprintf(stderr, "Usage: <script> <pid> <robot_id> <tick_length> <random_seed>\n");
       exit(1);
    }
-   kilo_str_id = strdup(argv[1]);
+   kilo_str_id = strdup(argv[2]);
    /* Open shared memory */
-   kilo_state_fd = shm_open(kilo_str_id, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+   char* shm_fname = malloc(strlen(argv[1]) + strlen(argv[2]) + 3);
+   shm_fname[0] = '/';
+   shm_fname[1] = 0;
+   strcat(shm_fname, argv[1]);
+   strcat(shm_fname, "_");
+   strcat(shm_fname, argv[2]);
+   kilo_state_fd = shm_open(shm_fname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+   free(shm_fname);
    if(kilo_state_fd < 0) {
       fprintf(stderr, "Opening the shared memory file of %s: %s\n", kilo_str_id, strerror(errno));
       exit(1);
@@ -225,9 +287,15 @@ int main(int argc, char* argv[]) {
    }
    /* Install cleanup function */
    atexit(cleanup);
-   /* Initialize variables */
+   /* Set uid */
    kilo_uid = argos_id_to_kilo_uid(kilo_str_id);
-   argos_tick_length = strtoul(argv[2], NULL, 10);
+   /* Set kilo_ticks delta */
+   kilo_ticks_delta = (strtof(argv[3], NULL) * TICKS_PER_SEC);
+   kilo_ms_delta = kilo_ticks_delta / TICKS_PER_SEC * 1000.0;
+   /* Initialize random number generator */
+   mt_rngstate = (int32_t*)malloc(MT_N * sizeof(int32_t));
+   mt_rngidx = MT_N + 1;
+   mt_setseed(strtoul(argv[4], NULL, 10));
    /* Call main of behavior */
    return __kilobot_main(argc, argv);
 }
