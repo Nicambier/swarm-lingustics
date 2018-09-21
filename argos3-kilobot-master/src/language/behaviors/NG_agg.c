@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "config.h"
+
 
 #define COMPLETE_TURN 53
 #define SIGMA 50
@@ -16,12 +18,13 @@ unsigned char sending_turn;
 float a,b;
 double m = 0.01;
 
-unsigned char inventory[100];
+uint8_t inventory[100];
 unsigned char ids[100];
 message_t* msgs[100];
 int inventory_size, msgs_size, n;
 
 float closest;
+unsigned char link;
 
 double rayleigh()
 {
@@ -46,24 +49,34 @@ void setup()
 {
     sending_turn = 0;
     
-    n = 0;
     a = 0;
     b = 0;
+    link = 0;
     inventory_size = 0;
     msgs_size = 0;
     
     message.data[1] = kilo_uid;
     message.data[0] = 0;
-    message.crc = message_crc(0);
     message.crc = message_crc(&message);
     
-    rand_seed(kilo_uid);
     rand_seed(rand_hard());
     
     walk = 1;
     next_turn=rayleigh();
     turn_turn=100; //flag value
     closest = -1;
+}
+
+void convertParams(uint8_t val)
+{
+    a = 1.25+0.25*(val>>4);
+    b = 1.25+0.25*(val&(unsigned char) 15);
+}
+
+void config(uint8_t params, uint8_t l)
+{
+    convertParams(params);
+    link = l;        
 }
 
 void speak(char activate) 
@@ -75,15 +88,11 @@ void speak(char activate)
                 inventory_size=1;
                 inventory[0] = rand_soft();
             }
-            else {
-                int r = rand_soft()%inventory_size;
-                message.data[0] = inventory[r];
-                
-            }
+            int r = rand_soft()%inventory_size;
+            message.data[0] = inventory[r];
             // It's important that the CRC is computed after the data has been set;
             // otherwise it would be wrong and the message would be dropped by the
             // receiver.
-            message.data[2] = n;
             message.crc = message_crc(&message);
         }
         sending_turn=1;
@@ -95,9 +104,9 @@ void speak(char activate)
     }      
 }
 
-unsigned char noise(unsigned char w)
+unsigned char noise(uint8_t w)
 {
-    unsigned char n = 0;
+    uint8_t n = 0;
     short int i;
     for(i=0; i<8; ++i)
     {
@@ -152,7 +161,8 @@ void hear()
                 }
             }
         }
-        //n = msgs_size; //temp -> this line erases previous operation in order to perform regular aggregation
+        if(link==NO_LINK)
+            n = msgs_size; //temp -> this line erases previous operation in order to perform regular aggregation
         msgs_size = 0; //delete messages;
     }
 }
@@ -162,7 +172,7 @@ void loop()
     if(walk)
     {
         //MOVES
-        set_color(RGB(0, 0, 1));
+        set_color(RGB(0, 0, 3));
         --next_turn;
         if(next_turn<=0) {
             if(turn_turn==100)
@@ -181,7 +191,7 @@ void loop()
                     set_motors(kilo_turn_left, 0);
                     ++turn_turn;
                 }
-                set_color(RGB(1, 0, 0));
+                set_color(RGB(3, 0, 0));
             }
         
         }
@@ -194,10 +204,13 @@ void loop()
         speak(0);
         
         //TRANSITION
-        a = 0;//1.7;
-        if(inventory_size==1) {
-            a = 1.25+0.25*(inventory[0]>>4);
+        if(link==EVO_LINK) {
+            a = 0;//1.7;
+            if(inventory_size==1) {
+                convertParams(inventory[0]);
+            }
         }
+        
         float p = 0.03+0.48*(1-exp(-a*n));
         float r = (float) rand_soft()/(float) 255;
         if(kilo_ticks%HEAR_TIME==0 && r < p) {
@@ -209,7 +222,7 @@ void loop()
     else//STAY
     {
         //MOVES
-        set_color(RGB(0, 1, 0));
+        set_color(RGB(0, 3, 0));
         set_motors(0, 0);
         
         //NAMING GAME
@@ -218,16 +231,16 @@ void loop()
             
         
         //TRANSITION
-        b = 0;//3.9;
-        if(inventory_size==1) {
-            b = 1.25+0.25*(inventory[0]&(unsigned char) 15);
+        if(link==EVO_LINK) {
+            b = 0;//3.9;
+            if(inventory_size==1) {
+                convertParams(inventory[0]);
+            }
         }
         float p = exp(-b*n);
         float r = (float) rand_soft()/(float) 255;
         if(kilo_ticks%HEAR_TIME==0 && r < p) {
             walk = 1;
-            //if(next_turn>0) //forces to turn if the bot is not already turning to leave
-            //    next_turn = 0;
         }
     }
 }
@@ -242,21 +255,13 @@ message_t *message_tx()
 
 void message_rx(message_t *m, distance_measurement_t *d)
 {
-    if(m->data[0] != 0 && !alreadyReceived(ids,m->data[1],msgs_size)) {
+    if(m->data[2] == CONFIG)
+        config(m->data[0],m->data[1]);
+    else if(m->data[0] != 0 && !alreadyReceived(ids,m->data[1],msgs_size)) {
         msgs[msgs_size]=m;
         ids[msgs_size]=m->data[1];
         ++msgs_size;
     }
-    /*float dist = estimate_distance(d);
-    if(closest==-1)
-        closest = dist;
-    if(dist < closest) {
-        closest = dist;
-        if(next_turn>0) {
-            next_turn=1;
-            closest = -1;
-        }
-    }*/
 }
 
 int main()

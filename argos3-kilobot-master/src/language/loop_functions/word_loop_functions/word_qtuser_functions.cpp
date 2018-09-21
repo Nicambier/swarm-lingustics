@@ -33,7 +33,7 @@ void CWORDQTUserFunctions::Draw(CKilobotEntity& c_kilobot_entity) {
    }
    
    if(exists) {
-        std::cout<<p<<" "<<(1.25+0.25*(p&(unsigned char) 15))<<" "<<(1.25+0.25*(p>>4))<<std::endl;
+        std::cout<<p<<" "<<(1.25+0.25*(p>>4))<<" "<<(1.25+0.25*(p&(unsigned char) 15))<<std::endl;
         //char c[] = {p,'\0'};
         
         DrawText(CVector3(0.02, 0.02, 0.01),   // position

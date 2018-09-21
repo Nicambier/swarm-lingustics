@@ -14,7 +14,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="100" output="test.txt" words="word" minDist="7" timeStopCond="0" />
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="20" output="test.txt" aParam="1.75" bParam="4" link="2" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->

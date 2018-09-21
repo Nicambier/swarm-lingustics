@@ -1,5 +1,9 @@
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/kilobot/simulator/kilobot_entity.h>
+#include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_entity.h>
+#include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_medium.h>
+#include <argos3/plugins/robots/kilobot/control_interface/kilolib.h>
+#include <argos3/plugins/robots/kilobot/control_interface/message.h>
 #include <argos3/core/simulator/entity/entity.h>
 #include "argos3/plugins/simulator/entities/box_entity.h"
 #include <fstream>
@@ -11,6 +15,7 @@
 #include <utility>
 #include <list>
 #include <math.h> 
+#include "../../behaviors/config.h"
 
 
 using namespace argos;
@@ -42,6 +47,7 @@ public:
     */
    
    virtual void PlaceBots();
+   virtual void ConfigBots();
    
    virtual void Reset();
 
@@ -91,6 +97,11 @@ private:   /**
    
    unsigned int minDist;
    unsigned int timeStopCond;
+   
+   float a;
+   float b;
+   
+   unsigned char link;
    
    std::vector<CKilobotEntity*> bots;
 
