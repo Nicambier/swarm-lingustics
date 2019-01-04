@@ -38,6 +38,8 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    GetNodeAttributeOrDefault(t_tree, "bParam", b, b);
    
    GetNodeAttributeOrDefault(t_tree, "link", link, link);
+   
+   GetNodeAttributeOrDefault(t_tree, "mutation", m, m);
 
    /* Open the file for text writing */
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -48,6 +50,17 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    ////////////////////////////////////////////////////////////////////////////////// CREATION AND POSITIONING OF THE ARENA WALLS////////////////////////////////////////////////////////////////////////////////
     CVector3 arena_size = GetSpace().GetArenaSize();
     float m_fArenaRadius = Min(arena_size[0],arena_size[1])/2;
+    /*switch(nBots) {
+        case 25:
+            m_fArenaRadius = 0.35;
+            break;
+        case 50:
+            m_fArenaRadius = 0.5;
+            break;
+        case 100:
+            m_fArenaRadius = 0.7;
+            break;
+    }*/
     unsigned int m_unNumArenaWalls = 20;
 
     CRadians wall_angle = CRadians::TWO_PI/m_unNumArenaWalls;CVector3 wall_size(0.01, 2.0*m_fArenaRadius*Tan(CRadians::PI/m_unNumArenaWalls), 0.05);
@@ -71,13 +84,11 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
         AddEntity(*pcKB);
     }
     
-    PlaceBots();
+    PlaceBots(m_fArenaRadius);
     ConfigBots();
 }
 
-void CAggregation::PlaceBots() {
-    CVector3 arena_size = GetSpace().GetArenaSize();
-    float m_fArenaRadius = Min(arena_size[0],arena_size[1])/2;
+void CAggregation::PlaceBots(float m_fArenaRadius) {
     
     CVector3 cPosition;
     CQuaternion cOrientation;
@@ -111,16 +122,18 @@ void CAggregation::PlaceBots() {
 }
 
 void CAggregation::ConfigBots() {
-    CKilobotEntity* kbEntity;
+    CKilobotEntity* kbEntity;    
+    
     for(unsigned int i=0; i<bots.size(); ++i) {        
         kbEntity = bots[i];
         CKilobotCommunicationEntity kilocomm = kbEntity->GetKilobotCommunicationEntity();
         message_t msg = *(new message_t());
         msg.type = NORMAL;
-        msg.data[2] = CONFIG;
+        msg.data[0] = CONFIG;
         //PARAMS
-        msg.data[0] = round((a-1.25)*4)*16 + round((b-1.25)*4);
         msg.data[1] = link;
+        msg.data[2] = (((uint8_t) round((a-1.25)*4))<<4) + (uint8_t) round((b-1.25)*4);
+        msg.data[4] = double_to_uint8(m);
         msg.crc = 0;//message_crc(&msg);
         GetSimulator().GetMedium<CKilobotCommunicationMedium>("kilocomm").SendOHCMessageTo(*kbEntity,&msg);
     }
@@ -131,7 +144,7 @@ void CAggregation::ConfigBots() {
 /****************************************/
 
 void CAggregation::Reset() {
-    PlaceBots();
+    //PlaceBots();
    /* Close the output file */
    m_cOutFile.close();
    if(m_cOutFile.fail()) {
@@ -160,6 +173,9 @@ void CAggregation::Destroy() {
 /****************************************/
 
 void CAggregation::PreStep() {
+    int clock = GetSpace().GetSimulationClock();
+    if(clock<20)
+        ConfigBots();
    /* Nothing to do */
 }
 

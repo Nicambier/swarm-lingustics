@@ -28,7 +28,7 @@ public:
    
 private:
     
-    std::map<std::string,unsigned char> lastWord;
+    std::map<std::string,uint8_t> lastWord;
     
    
 };

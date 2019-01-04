@@ -6,7 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="7" />
-    <experiment length="0"
+    <experiment length="3000"
                 ticks_per_second="10"
                 random_seed="0" />
   </framework>
@@ -14,7 +14,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="20" output="test.txt" aParam="1.75" bParam="4" link="2" timeStopCond="0" />
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" aParam="1.75" bParam="4" link="2" mutation="0" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->

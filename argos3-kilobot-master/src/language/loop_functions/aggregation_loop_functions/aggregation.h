@@ -1,3 +1,4 @@
+//#include <kilolib.h>
 #include <argos3/core/simulator/loop_functions.h>
 #include <argos3/plugins/robots/kilobot/simulator/kilobot_entity.h>
 #include <argos3/plugins/robots/kilobot/simulator/kilobot_communication_entity.h>
@@ -15,7 +16,8 @@
 #include <utility>
 #include <list>
 #include <math.h> 
-#include "../../behaviors/config.h"
+#include "../../config.h"
+#include "../../conversion.c"
 
 
 using namespace argos;
@@ -46,7 +48,7 @@ public:
     * It is executed every time you press the 'reset' button in the GUI.
     */
    
-   virtual void PlaceBots();
+   virtual void PlaceBots(float m_fArenaRadius);
    virtual void ConfigBots();
    
    virtual void Reset();
@@ -100,6 +102,8 @@ private:   /**
    
    float a;
    float b;
+   
+   double m;
    
    unsigned char link;
    
