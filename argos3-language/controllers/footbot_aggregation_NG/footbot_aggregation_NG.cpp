@@ -50,7 +50,8 @@ bool CFootBotAggregation_NG::hear(unsigned short int w) {
                 lexicon.clear();
                 lexicon.push_back(w);
             }
-        } else if(not inside)
+        }
+        else
             lexicon.push_back(w);        
     }
     

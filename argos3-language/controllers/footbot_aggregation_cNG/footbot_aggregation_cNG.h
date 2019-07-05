@@ -36,6 +36,8 @@ public:
     */
    virtual void Init(TConfigurationNode& t_node);
    
+   virtual void ControlStep();
+   
    virtual void ChangeState(unsigned short int newState);
    
    virtual unsigned int CountNeighbours();
@@ -67,8 +69,7 @@ public:
    virtual void Destroy() {}
    
 private:
-    double noise;
-    bool fitness;
+    double noise;    
     string ntype;
 };
 

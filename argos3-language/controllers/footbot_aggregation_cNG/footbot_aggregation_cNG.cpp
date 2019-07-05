@@ -16,12 +16,17 @@ CFootBotAggregation_cNG::CFootBotAggregation_cNG() : CFootBotAggregation_NG() {}
 void CFootBotAggregation_cNG::Init(TConfigurationNode& t_node) {
     GetNodeAttributeOrDefault(t_node, "noise", noise, noise);
     GetNodeAttributeOrDefault(t_node, "ntype", ntype, ntype);
-    GetNodeAttributeOrDefault(t_node, "fitness", fitness, fitness);
     CFootBotAggregation_NG::Init(t_node);
 }
 
 void CFootBotAggregation_cNG::Reset() {
     CFootBotAggregation_NG::Reset();
+}
+
+void CFootBotAggregation_cNG::ControlStep() {
+    CFootBotAggregation::ControlStep();
+    if(state==STATE_STAY)
+        speak(true); //will change the message systematically
 }
 
 /****************************************/
@@ -44,46 +49,44 @@ void CFootBotAggregation_cNG::ChangeState(unsigned short int newState) {
 
 unsigned int CFootBotAggregation_cNG::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-    unsigned int counter = 1;
+    unsigned int counter = 0;
     unsigned short int w;
     for(size_t i = 0; i < tPackets.size(); ++i) {
-        w = Noise(tPackets[i].Data[0]);
-        if(tPackets[i].Range < minDist and w > 0) {
+        if(tPackets[i].Range < minDist and tPackets[i].Data[0] != 0) {
+            w = Noise(tPackets[i].Data[0]);
             if(hear(w))
                 ++counter;
-            else
-                counter = 1;
+            else//comment this part for strong link
+                ++counter;
         }
     }
-    
     return counter;
 }
 
 float CFootBotAggregation_cNG::ComputeProba(unsigned int n) {
     short int w = GetWord();
-    //a = 0.02*w;
-    if(fitness)
-    {
-        if(w==0) {
-            a = 0;
-            b = 0;
-        } else {
-            a = 1.25+0.25*(w%16);
-            b = 1.25+0.25*(w/16);
-        }
+    if(w==0) {
+        a = 0;
+        b = 0;
+    } else {
+        a = 1.25+0.25*(w%16);
+        b = 1.25+0.25*(w/16);
     }
-    //cout << w << " " << a << " " << b << " " << endl;
+    //LOG << w << " " << a << " " << b << " " << endl;
     return CFootBotAggregation::ComputeProba(n);
 }
 
 unsigned short int CFootBotAggregation_cNG::Noise(unsigned short int w) {
     if(ntype=="shannon"){
-        unsigned short int n = 0;
+        unsigned short int m = 0;
         for(int bit=0; bit<8; ++bit)
-            if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < (noise/8))
-                n+=pow(2,bit);
-        return n ^ w;
+            if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < (noise)) {
+                m+=pow(2,bit);
+            }
+        unsigned short int res = m^w;
+        return res;
     }
+    /* This is broken, should harmonise with the new noise convention
     else if(ntype=="gauss")
     {
         unsigned short int a=w%16,b=w/16;
@@ -117,7 +120,7 @@ unsigned short int CFootBotAggregation_cNG::Noise(unsigned short int w) {
             b = m_pcRNG->Uniform(CRange<UInt32>(0,16));
         return b*16 + a;
         
-    }
+    }*/
 }
 
 string CFootBotAggregation_cNG::text() {

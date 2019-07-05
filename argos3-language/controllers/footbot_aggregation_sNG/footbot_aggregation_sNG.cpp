@@ -41,13 +41,13 @@ void CFootBotAggregation_sNG::ChangeState(unsigned short int newState) {
 
 unsigned int CFootBotAggregation_sNG::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-    unsigned int counter = 1;
+    unsigned int counter = 0;
     for(size_t i = 0; i < tPackets.size(); ++i) {
         if(tPackets[i].Range < minDist and tPackets[i].Data[0] > 0) {
             if(hear(tPackets[i].Data[0]))
                 ++counter;
             else
-                counter = 1;
+                counter = 0;
         }
     }
     

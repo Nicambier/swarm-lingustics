@@ -16,11 +16,12 @@ private:
     int type;
     double p1;
     double p2;
+    double p3;
 
     bool weak;
 
 public:
-    AgentFactory(int type, double p1=0, double p2=0);
+    AgentFactory(int type, double p1=0, double p2=0, double p3=0);
     Agent* GetNewAgent(World* w, Vector2D pos);
 
     void SetWeak(bool weak);

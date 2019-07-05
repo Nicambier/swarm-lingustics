@@ -2,15 +2,16 @@
 import numpy as np
 import math
 
-directory='comp8bit0to4'
-start=21
-qt=30
+start=1
+qt=20
 time=30000
 
-links = [103]
-sizes = [25,50,100]
-aRange = list(range(175,200,25))
-bRange = list(range(400,425,25))
+links = [101,102]
+sizes = [20,100]
+#aRange = list(range(0,625,25))
+#bRange = list(range(0,625,25))
+aRange = [200]
+bRange = [15000]
 mRange = [10]
 
 filename = 'out_'
@@ -29,15 +30,28 @@ def makeCluster(seed, pos):
 
     return cluster
 
-def process1(link,s,a,b):
+def variation(cluster):
+    meanpos = [0.0,0.0]
+    for pos in cluster:
+        meanpos[0]+=pos[0]
+        meanpos[1]+=pos[1]
+    meanpos[0]/=len(cluster)
+    meanpos[1]/=len(cluster)
+    var = 0
+    for pos in cluster:
+        var += pow(pos[0]-meanpos[0],2) + pow(pos[1]-meanpos[1],2)
+    #we don't need to divide by 4r**2 as that's 1 here
+    return var/len(cluster)
+
+def process1(directory,link,s,a,b):
     folder = directory+'/'+str(link)+'p'+str(s)+'a'+str(a)+'b'+str(b)+'/'
     processFolder(folder,s)
 
-def process2(link,s,m):
+def process2(directory,link,s,m):
     folder = directory+'/'+str(link)+'wp'+str(s)+'m'+str(m)+'/'
     processFolder(folder,s)
 
-def process3(link,s):
+def process3(directory,link,s):
     folder = directory+'/'+str(link)+'p'+str(s)+'/'
     processFolder(folder,s)
 
@@ -61,7 +75,7 @@ def processFolder(folder,s):
                         members = l[i].split('?')
                         coord = members[0].split(',')
                         pos.append((float(coord[0]),float(coord[1])))
-                        if(len(members)>1):
+                        if(len(members)>1 and members[1].strip()!=''):
                             words |= set([int(i) for i in members[1].split(',')])
 ##                    if(0 in words):
 ##                        words.remove(0)
@@ -74,22 +88,32 @@ def processFolder(folder,s):
                         pos = [p for p in pos if p not in clust]
 
                     lengths=[len(c) for c in clusters]
+                    if(len(clusters)>0):
+                        var = [variation(c) for c in clusters]
+                    else:
+                        var = [-1]
                     lengths.append(0)
-                    print(t,len(clusters),len(words),round(np.mean(lengths),3),max(lengths)/s,s-sum(lengths),sep='\t',file=f2)
+                    print(t,len(clusters),len(words),round(np.mean(lengths),3),max(lengths)/s,s-sum(lengths),np.mean(var),sep='\t',file=f2)
                 f2.close()
                         
         except IOError:
             print("No file:",folder+filename+str(nb))    
 
-def makeStats():
+def makeStats(directory):
     for link in links:
         for s in sizes:
             if(link==103):
                 for m in mRange:
-                    process2(link,s,m)
+                    process2(directory,link,s,m)
             elif(link==104):
-                process3(link,s)
+                process3(directory,link,s)
             else:
                 for a in aRange:
                     for b in bRange:
-                        process1(link,s,a,b)
+                        process1(directory,link,s,a,b)
+
+#Don't forget to comment that bit after use
+# or it will activate each time stats is imported (e.g. word_scatter or word_map)
+#dirs = ["highConstDensity2"]
+#for d in dirs:
+#    makeStats(d)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 #include <stdint.h>
 
 #include "world.h"
@@ -19,9 +20,9 @@ class Agent {
         World* world;
         
         Vector2D pos;
-        std::list<uint16_t> msgs;
+        std::vector<uint16_t> msgs;
         
-        std::list<uint16_t> new_msgs;
+        std::vector<uint16_t> new_msgs;
         
     public:
         Agent(World* w, Vector2D pos);
@@ -29,7 +30,7 @@ class Agent {
         
         void Run();
         virtual void Loop();
-        
+
         void Broadcast(uint16_t msg);
         void Receive(uint16_t msg);
         

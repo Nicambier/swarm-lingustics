@@ -2,7 +2,7 @@
 
 using namespace std;
 
-NgAggAgent::NgAggAgent(World* w, Vector2D pos, double aParam, double bParam, bool weak) : AggregationAgent(w,pos,aParam,bParam), weak(weak)
+NgAggAgent::NgAggAgent(World* w, Vector2D pos, double aParam, double bParam, double cParam, bool weak, short int bits) : AggregationAgent(w,pos,aParam,bParam,cParam), weak(weak), bits(bits)
 {
 
 }
@@ -10,15 +10,17 @@ NgAggAgent::NgAggAgent(World* w, Vector2D pos, double aParam, double bParam, boo
 void NgAggAgent::ComputeN()
 {
     n = 0;
-    for(list<uint16_t>::iterator it=msgs.begin(); it!=msgs.end(); ++it)
+    random_shuffle ( msgs.begin(), msgs.end() );
+    for(unsigned short int i=0; i<msgs.size(); ++i)
     {
-        if(Hear(*it))
+        if(Hear(msgs[i]))
             ++n;
         else
             n = 0;
     }
-    if(weak)
+    if(weak) {
         n = msgs.size();
+    }
 }
 
 void NgAggAgent::Signal()
@@ -29,28 +31,32 @@ void NgAggAgent::Signal()
 void NgAggAgent::Speak()
 {
     if(lexicon.size()==0)
-        lexicon.push_back(rand()%256);
-    if(lexicon.size()==1)
-        Broadcast(lexicon.front());
+        lexicon.push_back(rand()%(int) pow(2,bits));
+    Broadcast(lexicon[rand()%(int) lexicon.size()]);
 }
 
 bool NgAggAgent::Hear(uint16_t word)
 {
     bool found = false;
-    for(list<uint16_t>::iterator it=lexicon.begin(); it!=lexicon.end() && !found; ++it)
-        if(*it==word)
-            found = true;
+    //if(world->GetTime()%NG_TURNS==0) {
+        for(vector<uint16_t>::iterator it=lexicon.begin(); it!=lexicon.end() && !found; ++it)
+            if(*it==word)
+                found = true;
 
-    if(found)
-        lexicon.clear();
-    lexicon.push_back(word);
+        if(found)
+            lexicon.clear();
+        lexicon.push_back(word);
+    //}
     return found;
 }
 
 string NgAggAgent::toString() const {
-  string str = to_string(pos.x)+","+to_string(pos.y)+"?"+to_string(lexicon.front());
-  for(list<uint16_t>::const_iterator it=lexicon.begin(); it!=lexicon.end(); ++it)
-      if(it!=lexicon.begin())
-        str+=","+to_string(*it);
+  string str = to_string(pos.x)+","+to_string(pos.y)+"?";
+  if(lexicon.size()>0) {
+      str+=to_string(lexicon.front());
+      for(vector<uint16_t>::const_iterator it=lexicon.begin(); it!=lexicon.end(); ++it)
+          if(it!=lexicon.begin())
+            str+=","+to_string(*it);
+  }
   return str;
 }

@@ -170,7 +170,7 @@ void CFootBotAggregation::ChangeState(unsigned short int newState) {
 
 unsigned int CFootBotAggregation::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-    unsigned int counter = 1;
+    unsigned int counter = 0;
     for(size_t i = 0; i < tPackets.size(); ++i) {
         if(tPackets[i].Range < minDist and tPackets[i].Data[0] == STATE_STAY) {
             ++counter;
@@ -183,10 +183,10 @@ unsigned int CFootBotAggregation::CountNeighbours() {
 float CFootBotAggregation::ComputeProba(unsigned int n) {
     switch(probaRule) {
         case 1: //linear
+            ++n;
             return n*a;
             break;
         case 2: //functions
-            --n;
             switch(state) {
                 case STATE_WALK: //P_join
                     return 0.05+0.45*(1-exp(-a*n));
@@ -197,14 +197,11 @@ float CFootBotAggregation::ComputeProba(unsigned int n) {
             }
             break;
         case 3: //functions v1
-            --n;
             switch(state) {
                 case STATE_WALK: //P_join
-                    //return 0.05+0.45*(1-exp(-a*n));
                     return 0.03+0.48*(1-exp(-a*n));
                     break;
                 case STATE_STAY: //1-P_leave
-                    //return 1-0.75*exp(-b*n);
                     return 1-exp(-b*n);
                     break;
             }
@@ -216,7 +213,6 @@ void CFootBotAggregation::Walk() {
     --walkTurns;
     if(walkTurns == 0) {
         float p = ComputeProba(CountNeighbours());
-        //cout<<p<<endl;
         if(m_pcRNG->Uniform(CRange<Real>(0.0f,1.0f)) < p)
             ChangeState(STATE_STAY);
         else

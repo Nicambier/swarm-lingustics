@@ -6,7 +6,7 @@ import matplotlib.ticker as ticker
 from collections import Counter
 from mpl_toolkits.mplot3d import Axes3D
 
-directory='brute_force'
+directory='highConstDensity2'
 start=1
 qt=20
 time=30000
@@ -43,12 +43,11 @@ for s in sizes:
         aKey += 1
 
     npMat = np.matrix(mat)
-    ax = fig.add_subplot(1, len(sizes), i+1, projection='3d')
-    (x, y) = np.meshgrid(np.arange(npMat.shape[0]), np.arange(npMat.shape[1]))
-    surf = ax.plot_surface(x,y, npMat, cmap=plt.cm.coolwarm,vmin=0.075, vmax=0.941)
-##    orig_cmap = mpl.cm.gray
-##    shifted_cmap = shiftedColorMap(orig_cmap, midpoint=0.5, name='shifted')
-##    cb=axes[i].imshow(npMat, cmap='shifted', interpolation='none',vmin=0,vmax=1)
+    ax = fig.add_subplot(1, len(sizes), i+1)#, projection='3d')
+    #(x, y) = np.meshgrid(np.arange(npMat.shape[0]), np.arange(npMat.shape[1]))
+    #cb = ax.plot_surface(x,y, npMat, cmap=plt.cm.coolwarm,vmin=0.075, vmax=0.941)
+    orig_cmap = mpl.cm.gray
+    cb=ax.imshow(npMat, cmap='gray', interpolation='none',vmin=0,vmax=1)
     ax.set_title("N="+str(s))
     ax.set_xlabel("a")
     ax.set_ylabel("b",rotation=0)
@@ -60,7 +59,7 @@ for s in sizes:
     ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(4))
     #ax.invert_xaxis()
-    ax.invert_yaxis()
+    #ax.invert_yaxis()
     i+=1
     
     maxi = 0
@@ -84,6 +83,7 @@ for s in sizes:
     print("min N="+str(s),mini,minPara)
 
 cbar_ax = fig.add_axes([0.92, 0.1, 0.02, 0.8])
-fig.colorbar(surf,cax=cbar_ax)
+fig.colorbar(cb,cax=cbar_ax)
+plt.savefig(directory+'/brute_force.png',bbox_inches='tight')
 plt.show()
 

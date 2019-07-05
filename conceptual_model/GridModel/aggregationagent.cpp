@@ -2,7 +2,7 @@
 
 using namespace std;
 
-AggregationAgent::AggregationAgent(World* w, Vector2D pos, double aParam, double bParam) : Agent(w,pos), n(0), a(aParam), b(bParam), state(STATE_WALK)
+AggregationAgent::AggregationAgent(World* w, Vector2D pos, double aParam, double bParam, double cParam) : Agent(w,pos), n(0), a(aParam), b(bParam), c(cParam), d(1), state(STATE_WALK)
 {
 
 }
@@ -10,6 +10,7 @@ AggregationAgent::AggregationAgent(World* w, Vector2D pos, double aParam, double
 void AggregationAgent::Loop()
 {
     ComputeN();
+    //Signal();
     double r = (rand()%256)/256.0;
     switch (state) {
     case STATE_WALK:
@@ -44,5 +45,6 @@ double AggregationAgent::LeaveProba(int n)
 
 double AggregationAgent::JoinProba(int n)
 {
-    return 0.03+0.48*(1-exp(-a*n));
+    //return 0.03+c*(1-exp(-a*n));
+    return 0.125 + c*(1-exp(-a*n));
 }

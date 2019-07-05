@@ -56,6 +56,7 @@ public:
    virtual void PreStep();
    
    list< pair<float,float> > findCluster(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos);
+   list< pair<float,float> > findCluster2(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos);
    double std2D(list< pair<float,float> > pos);
    float connectivity(list< pair<float,float> > pos);
    int clustersInfo(list< pair<float,float> > pos, vector<int>& sizes, vector<double>& stds);
@@ -68,9 +69,7 @@ public:
    /**
     * Determines the end of the experiment.
     */
-   virtual bool IsExperimentFinished();
-
-private:
+   //virtual bool IsExperimentFinished();
 
 
 private:   /**

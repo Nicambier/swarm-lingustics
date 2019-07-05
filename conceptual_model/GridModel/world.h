@@ -29,6 +29,7 @@ class World {
 
         int GetSizeX() {return size_x;}
         int GetSizeY() {return size_y;}
+        int GetTime() {return t;}
 
         friend std::ostream & operator<<(std::ostream & Str, World const & w);
     

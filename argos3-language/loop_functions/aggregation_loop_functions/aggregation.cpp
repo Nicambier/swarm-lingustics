@@ -76,19 +76,18 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
     for(int i=0; i<nBots; ++i) {
         bool bDone = false;
         unTrials = 0;
-        
         pcFB = new CFootBotEntity("fb_" + ToString(i),"fdc");
         AddEntity(*pcFB);
         do {
             CRadians cRandomAngle = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
-            Real cRandomRadius = m_pcRNG->Uniform(CRange<int>(-m_fArenaRadius,m_fArenaRadius));
+            Real cRandomRadius = m_pcRNG->Uniform(CRange<Real>(-m_fArenaRadius,m_fArenaRadius));
 
             cPosition.SetX(cRandomRadius * Cos(cRandomAngle));
             cPosition.SetY(cRandomRadius * Sin(cRandomAngle));
 
             CRadians cRandomOrientation = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
             cOrientation.FromEulerAngles(cRandomOrientation, CRadians::ZERO, CRadians::ZERO);
-
+            
             bDone = MoveEntity(pcFB->GetEmbodiedEntity(), cPosition, cOrientation);
             ++unTrials;
         } while(!bDone && unTrials <= MAX_PLACE_TRIALS);
@@ -164,7 +163,7 @@ list< pair<float,float> > CAggregation::findCluster(list< pair<float,float> >::i
         while(hasNeighbours) {
             hasNeighbours = false;
             for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
-                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) < d) {
+                if(sqrt(pow((it->first - s.first),2)+pow((it->second - s.second),2)) <= d) {
                     hasNeighbours = true;
                     temp = findCluster(it,pos);
                     for (list< pair<float,float> >::iterator it2=temp.begin(); it2 != temp.end(); ++it2)
@@ -172,6 +171,61 @@ list< pair<float,float> > CAggregation::findCluster(list< pair<float,float> >::i
                     break;
                 }                
             }
+        }
+    }
+    
+    return cluster;
+}
+
+list< pair<float,float> > CAggregation::findCluster2(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos) {
+    list< pair<float,float> > cluster;
+    float d = minDist*0.01;
+    cluster.push_back(*seed);
+    pos.erase(seed);
+    
+    list< pair<float,float> >::iterator s2;
+    bool s2Found = false;
+    //find first neighbour
+    for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+        if(sqrt(pow((it->first - seed->first),2)+pow((it->second - seed->second),2)) <= d) {
+            cluster.push_back(*it);
+            pos.erase(it);
+            s2Found = true;
+            break;
+        }
+    }
+    
+    if(s2Found) {    
+        //find all bots with two neighbours already in the cluster
+        int n;
+        bool updated = true;
+        while(updated) {
+            updated=false;
+            for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
+                n=0;
+                for (list< pair<float,float> >::iterator itClust=cluster.begin(); itClust != cluster.end(); ++itClust) {
+                    if(sqrt(pow((it->first - itClust->first),2)+pow((it->second - itClust->second),2)) <= d) {
+                        ++n;
+                        if(n==2) break;
+                    }
+                }
+                
+                if(n>=2) { //this bot has at least two neighbours in the current cluster
+                    updated=true;                    
+                    cluster.push_back(*it);
+                    pos.erase(it);
+                    break;
+                }
+            }
+        }
+    }
+    
+    if(cluster.size()<3) {
+        pos.push_back(cluster.front());//make the list shift left
+        cluster.pop_front();  
+        if(s2Found) {
+            pos.push_front(cluster.front());
+            cluster.pop_front();
         }
     }
     
@@ -201,7 +255,7 @@ float CAggregation::connectivity(list< pair<float,float> > pos) {
 
     for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it) {
         for (list< pair<float,float> >::iterator it2=pos.begin(); it2 != pos.end(); ++it2) {
-            if(sqrt(pow((it->first - it2->first),2)+pow((it->second - it2->second),2)) < d) {
+            if(sqrt(pow((it->first - it2->first),2)+pow((it->second - it2->second),2)) <= d) {
                 ++tot;
             }
         }
@@ -213,6 +267,11 @@ float CAggregation::connectivity(list< pair<float,float> > pos) {
 int CAggregation::clustersInfo(list< pair<float,float> > pos, vector<int>& sizes, vector<double>& stds) {
     pair<float,float> seed;
     list< pair<float,float> > cluster;
+    list< pair<float,float> > cluster2;
+    list< pair<float,float> > pos2;
+    for (list< pair<float,float> >::iterator it=pos.begin(); it != pos.end(); ++it)
+        pos2.push_back(make_pair(it->first,it->second));
+    int c2=0;
     while(pos.size() > 0) {
         cluster = findCluster(pos.begin(),pos);
         if(cluster.size() >= 2) {
@@ -220,6 +279,29 @@ int CAggregation::clustersInfo(list< pair<float,float> > pos, vector<int>& sizes
             stds.push_back(std2D(cluster));
         }
     }
+    
+    vector<int> sizes2;
+    int res;
+    int fails=0;
+    while(fails<pos2.size()) {
+        res = findCluster(pos2.begin(),pos2).size();
+        if(res!=0) {
+            sizes2.push_back(res); 
+            fails=0;
+        }
+        else
+            ++fails;        
+    }
+    
+    /*LOG<<sizes.size()<<" "<<sizes2.size()<<"\n";
+    for (vector<int>::iterator it=sizes.begin(); it != sizes.end(); ++it)
+        LOG<<*it<<" ";
+    LOG<<"\n";
+    for (vector<int>::iterator it=sizes2.begin(); it != sizes2.end(); ++it)
+        LOG<<*it<<" ";
+    LOG<<"\n\n";*/
+        
+    
             
     return sizes.size();
 }
@@ -259,8 +341,10 @@ void CAggregation::PostStep() {
             sizeAcc += sizes[i];
             stdAcc += stds[i];
         }
+        int nb2 = nb;
+        if(nb2==0) nb2=1;
 
-        m_cOutFile<<connectivity(positions)<<" "<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb<<" "<<stdAcc/nb;
+        m_cOutFile<<connectivity(positions)<<" "<<words.size()<<" "<<sizes.size()<<" "<<(float) sizeAcc/nb2<<" "<<stdAcc/nb2;
         for(int i=0; i<nb; ++i)
             m_cOutFile<<" "<<sizes[i];
         
@@ -269,7 +353,7 @@ void CAggregation::PostStep() {
     }
 }
 
-bool CAggregation::IsExperimentFinished() {
+/*bool CAggregation::IsExperimentFinished() {
     if(timeStopCond > 0) {
         bool stabilised = true;
         CSpace::TMapPerType& cFBMap = GetSpace().GetEntitiesByType("foot-bot");
@@ -281,7 +365,7 @@ bool CAggregation::IsExperimentFinished() {
                     }
         return stabilised;
     }
-}
+}*/
 
 /****************************************/
 /****************************************/

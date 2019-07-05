@@ -4,7 +4,7 @@ using namespace std;
 
 Agent::Agent(World* w, Vector2D pos) {
     world = w;
-    broadcast_range = 2;
+    broadcast_range = 1;
     this->pos = pos;
 }
 

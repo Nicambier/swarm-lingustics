@@ -92,7 +92,7 @@ uint16_t World::CellColour(int x, int y) {
     if(isOccupied(x,y)) {
         return map[x][y]->GetColour();
     }else
-        return 255;
+        return 65535;
 }
 
 ostream & operator<<(ostream & Str, World const & w) {

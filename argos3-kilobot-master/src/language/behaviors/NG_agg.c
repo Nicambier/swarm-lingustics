@@ -14,6 +14,8 @@
 #define PI 3.14159265358979323846
 #define TWO_PI 2.0*PI
 
+//#define MAX_DIST 2
+
 int next_turn, turn_turn;
 char walk;
 
@@ -78,8 +80,10 @@ void convertParams(uint8_t val)
 {
     if(walk)
         a = 1.25 + 0.25*(val>>4);
+        //a = 0.25*(val>>4);
     else
         b = 1.25 + 0.25*(val%16);
+        //b = 0.25*(val%16);
 }
 
 void config(uint8_t l, uint8_t params, uint8_t mutation)
@@ -132,30 +136,39 @@ uint8_t noise(uint8_t w)
     return w;
 }
 
-short int idxOf(uint8_t* ids, uint8_t id, int ids_size)
+/*unsigned int computeDist(uint8_t w1, uint8_t w2)
 {
-    short int i;
-    for(i=0; i<ids_size; ++i) {
-        if(ids[i]==id)
-            break;
+    uint8_t xor = w1 ^ w2;
+    unsigned int dist = 0;
+    //Brian Kernighan’s Algorithm to count set bits
+    while(xor != 0) {
+        xor = xor & (xor-1);
+        ++dist;
     }
-    return i;
-}
+    return dist;        
+}*/
 
 void hear()
 {
     n=0;
     int i;
+    
+    /*int scores[100];
+    for(i=0; i<100; ++i)
+        scores[i] = 0;*/
+    
     for(i=0; i<msgs_size; ++i) {
         uint8_t inside = 0;
         uint8_t w=msgs[i];
-        if(link==EVO_LINK || link==STRONG_LINK)
+        if(link==EVO_LINK)
             w=noise(w);
 
         int j = 0;
         while(j<inventory_size && !inside) {
-            if(inventory[j]==w)
+            if(inventory[j]==w) {
+                //++scores[j];
                 inside = 1;
+            }
             ++j;
         }
         
@@ -163,13 +176,29 @@ void hear()
             n+=1;
             inventory[0] = w;
             inventory_size = 1;
-        } else {
+        }
+        else {
             n=0;
             inventory[inventory_size] = w;
             ++inventory_size;
         }
     }
-    if(link==NO_LINK)
+    /*int best = 0;
+    int best_idx;
+    for(i=0; i<inventory_size; ++i) {
+        if(scores[i] > best) {
+            best = scores[i];
+            best_idx = i;
+        }
+    }
+    if(best>0) {
+        inventory[0] = inventory[best_idx];
+        inventory_size = 1;
+    }
+    n = best;*/
+    
+    
+    if(link==NO_LINK || 1)
         n = msgs_size; //this line erases previous operation in order to perform regular aggregation
     msgs_size = 0; //delete messages;
 }
@@ -266,11 +295,21 @@ message_t *message_tx()
         return 0;
 }
 
+short int idxOf(uint8_t* ids, uint8_t id, int ids_size)
+{
+    short int i;
+    for(i=0; i<ids_size; ++i) {
+        if(ids[i]==id)
+            break;
+    }
+    return i;
+}
+
 void message_rx(message_t *m, distance_measurement_t *d)
 {
     if(m->data[0] == CONFIG)
         config(m->data[1],m->data[2],m->data[4]);
-    else if(m->data[0]==WORD) 
+    else if(m->data[0] == WORD) 
     {
         short int idx = idxOf(ids,m->data[1],msgs_size);
         msgs[idx]=m->data[2];

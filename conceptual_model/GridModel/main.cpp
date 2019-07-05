@@ -20,30 +20,16 @@ void run(int size_x, int size_y, int pop, AgentFactory* factory, int time, int j
     World w(size_x, size_y, pop, factory);
     ofstream outfile (file);
     for(int t=0; t<time; ++t) {
-        if(t%100==0)
-            outfile<<w<<endl;
+        //if(t%500==0)
+        //    outfile<<w<<endl;
         w.Run();
     }
     outfile<<w<<endl;
     outfile.close();
     lock_guard<mutex> lk(m);
-    cout<<"done: "<<dir<<" "<<j<<endl;
+    //cout<<"done: "<<dir<<" "<<j<<endl;
     --counter;
     cv.notify_all();
-}
-
-void show(World& w, int time) {
-    GridWindow window(w.GetSizeX(), w.GetSizeY());
-    window.Display(w);
-    window.show();
-    for(int t=0; t<time; ++t) {
-        w.Run();
-
-        window.Display(w);
-        QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-        window.update();
-
-    }
 }
 
 void waitAvailable() {
@@ -52,28 +38,32 @@ void waitAvailable() {
 }
 
 int main(int argc, char * argv[]) {
-    string folder = "../comp8bit0to4";
-    int x = 30;
-    int y = 30;
+    string folder = "../com_range1/brute_force";
+    int x[] = {25,35,50,71};
+    int y[] = {25,35,50,71};
 
-    int types[] = {TYPE_EE_AGG_AGENT};
-    int pop[] = {25,50,100};
+    int types[] = {TYPE_AGG_AGENT};
+    int pop[] = {25};
 
-    double aParam[1] = {1.75};
-    double bParam[1] = {4};
-    //for(int ab = 0; ab<25; ++ab) {aParam[ab]=ab*0.25; bParam[ab]=ab*0.25;}
+    //double aParam[] = {2};
+    //double bParam[] = {150};
+    double aParam[32];
+    double bParam[32];
+    double cParam[8];
+    for(int ab = 0; ab<32; ++ab) {aParam[ab]=0.25 + ab*0.25; bParam[ab]=0.25 + ab*0.25;}
+    for(int c = 0; c<8; ++c) {cParam[c]=c*0.125;}
 
-    double mParam[] = {0.01};
+    double mParam[] = {0.01, 0.001};
 
     bool weak = true;
     string strength = "";
 
-    int time = 30000;
-    int start = 21;
-    int runs = 30;
+    int time = 100000;
+    int start = 1;
+    int runs = 20;
 
     vector<thread> threads;
-    cout<<thread::hardware_concurrency()<<endl;
+    cout<<folder<<" "<<thread::hardware_concurrency()<<endl;
     for(unsigned int p=0; p<sizeof(pop) / sizeof(int); ++p) {
         for(unsigned int i=0; i<sizeof(types) / sizeof(int); ++i) {
             if(types[i]==TYPE_EE_AGG_AGENT) {
@@ -87,10 +77,10 @@ int main(int argc, char * argv[]) {
                         cerr<<"Error creating "<<dir<<endl;
                         exit(1);
                     }
-                    for(int j=start; j<=start+runs; ++j) {
+                    for(int j=start; j<start+runs; ++j) {
                         waitAvailable();
                         ++thread_counter;
-                        threads.push_back(thread(run, x, y, pop[p], factory,time,j,ref(thread_counter),dir));
+                        threads.push_back(thread(run, x[p], y[p], pop[p], factory,time,j,ref(thread_counter),dir));
                         //run(x, y, pop[p], factory,time,runs,dir);
                     }
                 }
@@ -105,30 +95,32 @@ int main(int argc, char * argv[]) {
                     cerr<<"Error creating "<<dir<<endl;
                     exit(1);
                 }
-                for(int j=start; j<=start+runs; ++j) {
+                for(int j=start; j<start+runs; ++j) {
                     waitAvailable();
                     ++thread_counter;
-                    threads.push_back(thread(run, x, y, pop[p], factory,time,j,ref(thread_counter),dir));
+                    threads.push_back(thread(run, x[p], y[p], pop[p], factory,time,j,ref(thread_counter),dir));
                     //run(x, y, pop[p], factory,time,runs,dir);
                 }
             }
             else {
                 for(unsigned int a=0; a<sizeof(aParam) / sizeof(double); ++a) {
                     for(unsigned int b=0; b<sizeof(bParam) / sizeof(double); ++b) {
-                        AgentFactory* factory = new AgentFactory(types[i], aParam[a], bParam[b]);
-                        if(weak) {strength = "w"; factory->SetWeak(weak);} else strength = "";
-                        string dir = folder+"/"+to_string(types[i])+strength+"p"+to_string(pop[p])+"a"+to_string((int) (aParam[a]*100))+"b"+to_string((int) (bParam[b]*100))+"/";
-                        const int dir_err = system(("mkdir -p "+dir).c_str());
-                        if (-1 == dir_err)
-                        {
-                            cerr<<"Error creating "<<dir<<endl;
-                            exit(1);
-                        }
-                        for(int j=start; j<=start+runs; ++j) {
-                            waitAvailable();
-                            ++thread_counter;
-                            threads.push_back(thread(run, x, y, pop[p], factory,time,j,ref(thread_counter),dir));
-                            //run(x, y, pop[p], factory,time,runs,dir);
+                        for(unsigned int c=0; c<sizeof(cParam) / sizeof(double); ++c) {
+                            AgentFactory* factory = new AgentFactory(types[i], aParam[a], bParam[b]);
+                            strength = "";
+                            string dir = folder+"/"+to_string(types[i])+strength+"p"+to_string(pop[p])+"a"+to_string((int) (aParam[a]*100))+"b"+to_string((int) (bParam[b]*100))+"c"+to_string((int) (cParam[c]*1000))+"/";
+                            const int dir_err = system(("mkdir -p "+dir).c_str());
+                            if (-1 == dir_err)
+                            {
+                                cerr<<"Error creating "<<dir<<endl;
+                                exit(1);
+                            }
+                            for(int j=start; j<start+runs; ++j) {
+                                waitAvailable();
+                                ++thread_counter;
+                                threads.push_back(thread(run, x[p], y[p], pop[p], factory,time,j,ref(thread_counter),dir));
+                                //run(x, y, pop[p], factory,time,runs,dir);
+                            }
                         }
                     }
                 }
@@ -139,9 +131,13 @@ int main(int argc, char * argv[]) {
     for (auto& th : threads) th.join();
     cout<<"done"<<endl;
 
-    /*QApplication app(argc,argv);
-    AgentFactory* factory = new AgentFactory(TYPE_NG_AGG_AGENT, 1.75, 4);
-    World w(x, y, pop, factory);
-    show(w,30000);
-    cout<<"done"<<endl;*/
+    //AgentFactory* factory = new AgentFactory(TYPE_AGG_AGENT, 0.5, 1.25);
+    /*AgentFactory* factory = new AgentFactory(TYPE_EE_AGG_AGENT, 0.01);
+    factory->SetWeak(true);
+    World w(70, 70, 200, factory);
+    QApplication app(argc,argv);
+    GridWindow window(w.GetSizeX(), w.GetSizeY(),w,1000000);
+    window.show();
+    //window.Play(w,100000);
+    return app.exec();*/
 }

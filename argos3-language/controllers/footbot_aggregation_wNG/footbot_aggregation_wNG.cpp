@@ -41,7 +41,7 @@ void CFootBotAggregation_wNG::ChangeState(unsigned short int newState) {
 
 unsigned int CFootBotAggregation_wNG::CountNeighbours() {
     const CCI_RangeAndBearingSensor::TReadings& tPackets = m_pcRABS->GetReadings();
-    unsigned int counter = 1;
+    unsigned int counter = 0;
     for(size_t i = 0; i < tPackets.size(); ++i) {
         if(tPackets[i].Range < minDist and tPackets[i].Data[0] != STATE_WALK) {
             hear(tPackets[i].Data[0]);

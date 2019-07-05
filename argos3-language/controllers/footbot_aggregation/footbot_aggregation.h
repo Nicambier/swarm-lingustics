@@ -17,6 +17,8 @@
 /* Definitions for random number generation */
 #include <argos3/core/utility/math/rng.h>
 
+#include "argos3/core/utility/logging/argos_log.h"
+
 #include <string>
 #include <math.h>
 

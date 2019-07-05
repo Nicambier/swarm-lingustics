@@ -132,6 +132,7 @@ void CAggregation::ConfigBots() {
         msg.data[0] = CONFIG;
         //PARAMS
         msg.data[1] = link;
+        //msg.data[2] = (((uint8_t) round((a)*4))<<4) + (uint8_t) round((b)*4);
         msg.data[2] = (((uint8_t) round((a-1.25)*4))<<4) + (uint8_t) round((b-1.25)*4);
         msg.data[4] = double_to_uint8(m);
         msg.crc = 0;//message_crc(&msg);
@@ -190,7 +191,7 @@ void CAggregation::PostStep() {
             CKilobotCommunicationEntity kilocomm = kbEntity.GetKilobotCommunicationEntity();
             unsigned char word;
             if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS)
-                word = kilocomm.GetTxMessage()->data[0];
+                word = kilocomm.GetTxMessage()->data[2];
             
             m_cOutFile << "( " << Robot_X << " , " << Robot_Y << " , " << ((unsigned int) word) << ") ";
         }

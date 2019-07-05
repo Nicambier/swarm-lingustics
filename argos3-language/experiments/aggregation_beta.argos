@@ -84,7 +84,7 @@
   <!-- ****************** -->
   <!-- * Visualization * -->
   <!-- ****************** -->
-  <!--visualization>      
+  <visualization>      
     <qt-opengl lua_editor="false">
       <user_functions library="../build/loop_functions/word_loop_functions/libword_loop_functions"
                       label="word_qtuser_functions" />
@@ -95,6 +95,6 @@
       </camera>
     </qt-opengl>
     
-  </visualization-->
+  </visualization>
 
 </argos-configuration>
