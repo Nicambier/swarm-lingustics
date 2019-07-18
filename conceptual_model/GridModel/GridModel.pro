@@ -1,4 +1,7 @@
 QT += widgets
+LIBS += -lgsl -lgslcblas
+
+QMAKE_CXXFLAGS += -std=c++11
 
 HEADERS += \
     gridwindow.h \

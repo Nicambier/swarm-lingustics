@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QColor>
 #include <QPushButton>
+#include <unistd.h>
 
 #include "world.h"
 
@@ -24,7 +25,7 @@ private:
     int size_x, size_y;
     int time;
 
-    void cellActivation(int x, int y, uint16_t);
+    void cellActivation(int x, int y, uint32_t);
     void Display(World* w);
     void Play();
 public:

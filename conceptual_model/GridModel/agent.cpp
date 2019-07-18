@@ -22,15 +22,15 @@ void Agent::Loop() {
     RandomWalk();
 }
 
-void Agent::Broadcast(uint16_t msg) {
+void Agent::Broadcast(uint32_t msg) {
     world->BroadcastFrom(GetPos(),broadcast_range,msg);
 }
 
-void Agent::Receive(uint16_t msg) {
+void Agent::Receive(uint32_t msg) {
     new_msgs.push_back(msg);
 }
 
-Vector2D Agent::GetPos() {
+Vector2D Agent::GetPos() const {
     return pos;
 }
 
@@ -39,7 +39,7 @@ void Agent::SetPos(Vector2D newPos) {
 }
 
 void Agent::RandomWalk() {
-    int dir = rand() % 4;
+    int dir = world->random(4);
     Vector2D newPos = pos;
     switch(dir) {
         case 0:

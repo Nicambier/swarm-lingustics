@@ -6,7 +6,7 @@
 
 using namespace std;
 
-World::World(int x, int y, int pop, AgentFactory* factory) {
+World::World(int x, int y, int pop, AgentFactory* factory, unsigned int seed) {
     size_x = x;
     size_y = y;
     
@@ -21,14 +21,22 @@ World::World(int x, int y, int pop, AgentFactory* factory) {
             map[i][j] = 0;
     }
     
-    srand (time(NULL));
+    const gsl_rng_type * T;
+    gsl_rng_env_setup();
+    T = gsl_rng_default; // Generator setup
+    rng = gsl_rng_alloc (T);
+    if(seed!=0)
+        gsl_rng_set(rng, seed);
+
     bool placed;
     Vector2D pos;
+    if(size_x*size_y<pop)
+        throw "Too many agents for this world.";
     for(int i=0; i<pop; ++i) {
         placed = false;
         while(!placed) {
-            pos.x = rand()%size_x;
-            pos.y = rand()%size_y;
+            pos.x = random(size_x);
+            pos.y = random(size_y);
             
             if(!isOccupied(pos.x,pos.y)) {
                 agents.push_back(factory->GetNewAgent(this, pos));
@@ -49,7 +57,8 @@ World::~World() {
         }
         delete map[i];
     }
-    delete map;    
+    delete map;
+    gsl_rng_free (rng);
 }
         
 bool World::MoveAgentTo(Agent* a, Vector2D pos) {
@@ -66,9 +75,10 @@ bool World::MoveAgentTo(Agent* a, Vector2D pos) {
     return placed;
 }
 
-void World::BroadcastFrom(Vector2D from, int range, uint16_t msg) {
+void World::BroadcastFrom(Vector2D from, int range, uint32_t msg) {
     for(int i=from.x-range; i<=from.x+range; ++i) {
-        for(int j=from.y-(range-abs(from.x-i)); j<=from.y+(range-abs(from.x-i)); ++j) {
+        //for(int j=from.y-(range-(from.x-i)); j<=from.y+(range-(from.x-i)); ++j) {
+        for(int j=from.y-range; j<=from.y+range; ++j) {
             if(i>=0 and i<size_x and j>=0 and j<size_y and (i!=from.x or j!=from.y)) {
                 if(isOccupied(i,j))
                     map[i][j]->Receive(msg);
@@ -88,11 +98,54 @@ bool World::isOccupied(int x, int y) {
     return map[x][y] != 0;
 }
 
-uint16_t World::CellColour(int x, int y) {
+uint32_t World::CellColour(int x, int y) {
     if(isOccupied(x,y)) {
         return map[x][y]->GetColour();
     }else
-        return 65535;
+        return 16777215;
+}
+
+list<Agent*> World::findCluster(list<Agent*>::iterator seed, list<Agent*>& unassigned) const
+{
+    list<Agent*> cluster;
+    Vector2D s = (*seed)->GetPos();
+    cluster.push_back(*seed);
+    unassigned.erase(seed);
+
+    float d = (*seed)->GetBroadCastRange();
+    if(unassigned.size() > 0) {
+        bool hasNeighbours = true;
+        while(hasNeighbours) {
+            hasNeighbours = false;
+            for (list<Agent*>::iterator it=unassigned.begin(); it != unassigned.end(); ++it) {
+                Vector2D other = (*it)->GetPos();
+                if(abs(other.x - s.x)+abs(other.y - s.y) <= d) {
+                    hasNeighbours = true;
+                    list<Agent*> temp = findCluster(it,unassigned);
+                    for (list<Agent*>::iterator it2=temp.begin(); it2 != temp.end(); ++it2)
+                        cluster.push_back(*it2);
+                    break;
+                }
+            }
+        }
+    }
+    return cluster;
+}
+
+double World::Evaluate() {
+    list<Agent*> unassigned;
+    for(list<Agent*>::iterator it=agents.begin(); it != agents.end(); ++it) {
+        unassigned.push_back(*it);
+    }
+    int totSize = 0;
+    unsigned int max = 0;
+    while(agents.size()-totSize > max) {
+        unsigned int size = findCluster(unassigned.begin(), unassigned).size();
+        if(size>max)
+            max=size;
+        totSize+=size;
+    }
+    return ((double) max)/agents.size();
 }
 
 ostream & operator<<(ostream & Str, World const & w) {

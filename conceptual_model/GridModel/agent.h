@@ -20,9 +20,9 @@ class Agent {
         World* world;
         
         Vector2D pos;
-        std::vector<uint16_t> msgs;
+        std::vector<uint32_t> msgs;
         
-        std::vector<uint16_t> new_msgs;
+        std::vector<uint32_t> new_msgs;
         
     public:
         Agent(World* w, Vector2D pos);
@@ -31,15 +31,20 @@ class Agent {
         void Run();
         virtual void Loop();
 
-        void Broadcast(uint16_t msg);
-        void Receive(uint16_t msg);
+        void Broadcast(uint32_t msg);
+        void Receive(uint32_t msg);
         
-        Vector2D GetPos();
+        Vector2D GetPos() const;
         void SetPos(Vector2D newPos);
         
         void RandomWalk();
 
-        virtual uint16_t GetColour() {
+        int GetBroadCastRange() const {
+            return broadcast_range;
+        }
+
+
+        virtual uint32_t GetColour() const {
             return 0;
         }
 

@@ -10,11 +10,11 @@ protected:
 public:
     EeAggAgent(World* w, Vector2D pos, double mutation_rate, bool weak, short int bits = 8);
 
-    virtual bool Hear(uint16_t word);
+    virtual bool Hear(uint32_t word);
     virtual void ComputeN();
     virtual void UpdateParameters();
 
-    uint16_t Mutate(uint16_t word);
+    uint32_t Mutate(uint32_t word);
 };
 
 #endif // EEAGGAGENT_H

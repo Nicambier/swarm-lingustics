@@ -31,10 +31,11 @@ GridWindow::GridWindow(int size_x, int size_y, World& world, int t): w(&world), 
     //show();
 }
 
-void GridWindow::cellActivation(int x, int y, uint16_t c){
+void GridWindow::cellActivation(int x, int y, uint32_t c){
     //grid->item(y,x)->setText("");
-    grid->item(y,x)->setBackgroundColor(QColor(4*(c>>10),8 * ((c>>5) & 31),8 * (c & 31)));
-    //grid->item(y,x)->setTextColor(QColor(4*(c>>10),8 * ((c>>5) & 31),8 * (c & 31)));
+    grid->item(y,x)->setBackgroundColor(QColor(c>>16,(c>>8) & 255,c & 255));
+    //grid->item(y,x)->setBackgroundColor(QColor(4*(c>>10),8 * ((c>>5) & 31),8 * (c & 31))); //16 bits
+    //grid->item(y,x)->setTextColor(QColor(4*(c>>10),8 * ((c>>5) & 31),8 * (c & 31))); //8 bits
 }
 
 void GridWindow::Display(World* w) {
@@ -51,6 +52,8 @@ void GridWindow::Play() {
 
         Display(w);
         QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+        //std::cout<<*w<<std::endl;
+        //usleep(10000);
         update();
     }
 }

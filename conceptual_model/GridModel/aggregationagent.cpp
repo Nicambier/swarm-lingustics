@@ -11,7 +11,7 @@ void AggregationAgent::Loop()
 {
     ComputeN();
     //Signal();
-    double r = (rand()%256)/256.0;
+    double r = world->uniform();
     switch (state) {
     case STATE_WALK:
         if(r<JoinProba(n))
@@ -21,8 +21,10 @@ void AggregationAgent::Loop()
         break;
     case STATE_STAY:
         Signal(); //you need to signal before transition or this would never happen since LeaveProba=1 when n=0
-        if(r<LeaveProba(n))
+        if(r<LeaveProba(n)) {
             state = STATE_WALK;
+            RandomWalk();
+        }
         //else do nothing
         break;
     }
@@ -45,6 +47,5 @@ double AggregationAgent::LeaveProba(int n)
 
 double AggregationAgent::JoinProba(int n)
 {
-    //return 0.03+c*(1-exp(-a*n));
-    return 0.125 + c*(1-exp(-a*n));
+    return d + c*(1-exp(-a*n));
 }

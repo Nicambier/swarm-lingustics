@@ -18,12 +18,13 @@ Agent* AgentFactory::GetNewAgent(World* w, Vector2D pos)
         return new NgAggAgent(w, pos, p1, p2, p3, weak);
         break;
     case TYPE_EE_AGG_AGENT:
-        return new EeAggAgent(w, pos, p1, weak,13);
+        return new EeAggAgent(w, pos, p1, weak,24);
         break;
     case TYPE_RANDOM_AGG_AGENT:
         return new RandomAggAgent(w, pos);
         break;
     }
+    return nullptr;
 }
 
 void AgentFactory::SetWeak(bool weak)

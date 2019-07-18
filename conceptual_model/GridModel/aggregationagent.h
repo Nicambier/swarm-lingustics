@@ -30,15 +30,16 @@ public:
 
     virtual void Signal();
 
-    virtual uint16_t GetColour() {
+    virtual uint32_t GetColour() const {
         switch (state) {
             case STATE_STAY:
-                return 31<<5;
+                return 255<<8;
                 break;
             case STATE_WALK:
                 return 0;
                 break;
             }
+        return 0;
     }
 };
 

@@ -4,7 +4,7 @@ using namespace std;
 
 NgAggAgent::NgAggAgent(World* w, Vector2D pos, double aParam, double bParam, double cParam, bool weak, short int bits) : AggregationAgent(w,pos,aParam,bParam,cParam), weak(weak), bits(bits)
 {
-
+    lexicon.push_back(world->random(pow(2,bits)));
 }
 
 void NgAggAgent::ComputeN()
@@ -30,16 +30,16 @@ void NgAggAgent::Signal()
 
 void NgAggAgent::Speak()
 {
-    if(lexicon.size()==0)
-        lexicon.push_back(rand()%(int) pow(2,bits));
-    Broadcast(lexicon[rand()%(int) lexicon.size()]);
+    /*if(lexicon.size()==0)
+        lexicon.push_back(world->random(pow(2,bits)));*/
+    Broadcast(lexicon[world->random(lexicon.size())]);
 }
 
-bool NgAggAgent::Hear(uint16_t word)
+bool NgAggAgent::Hear(uint32_t word)
 {
     bool found = false;
     //if(world->GetTime()%NG_TURNS==0) {
-        for(vector<uint16_t>::iterator it=lexicon.begin(); it!=lexicon.end() && !found; ++it)
+        for(vector<uint32_t>::iterator it=lexicon.begin(); it!=lexicon.end() && !found; ++it)
             if(*it==word)
                 found = true;
 
@@ -51,12 +51,15 @@ bool NgAggAgent::Hear(uint16_t word)
 }
 
 string NgAggAgent::toString() const {
-  string str = to_string(pos.x)+","+to_string(pos.y)+"?";
-  if(lexicon.size()>0) {
+    string str = to_string(pos.x)+","+to_string(pos.y)+"?";
+    if(lexicon.size()>0) {
       str+=to_string(lexicon.front());
-      for(vector<uint16_t>::const_iterator it=lexicon.begin(); it!=lexicon.end(); ++it)
+      for(vector<uint32_t>::const_iterator it=lexicon.begin(); it!=lexicon.end(); ++it)
           if(it!=lexicon.begin())
             str+=","+to_string(*it);
-  }
-  return str;
+    }
+    /*string str;
+    if(lexicon.size()==1)
+       str = "a: "+to_string(a)+" b:"+to_string(b)+" c:"+to_string(c);*/
+    return str;
 }
