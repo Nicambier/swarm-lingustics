@@ -4,7 +4,9 @@ using namespace std;
 
 NgAggAgent::NgAggAgent(World* w, Vector2D pos, double aParam, double bParam, double cParam, bool weak, short int bits) : AggregationAgent(w,pos,aParam,bParam,cParam), weak(weak), bits(bits)
 {
+    //lexicon.push_back(255);//world->random(pow(2,bits)));
     lexicon.push_back(world->random(pow(2,bits)));
+    state=STATE_STAY;
 }
 
 void NgAggAgent::ComputeN()

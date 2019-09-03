@@ -1,6 +1,7 @@
 #include "agentfactory.h"
 #include "gridwindow.h"
 #include "world.h"
+#include "erosion.h"
 #include <iostream>
 #include <fstream>
 #include <atomic>
@@ -46,10 +47,11 @@ int AutoDisplay(int argc, char * argv[], int type_agent, double p1=0, double p2=
     AgentFactory* factory = new AgentFactory(type_agent, p1, p2, p3);
     //AgentFactory* factory = new AgentFactory(type_agent, 0);
     factory->SetWeak(true);
-    World w(25, 25, 25, factory);
+    Erosion w(71, 71, 200, factory);
     QApplication app(argc,argv);
     GridWindow window(w.GetSizeX(), w.GetSizeY(),w,200000);
     window.show();
+    //usleep(10000);
     delete factory;
     return app.exec();
 }
@@ -185,7 +187,7 @@ void configuredRun(int argc, char * argv[]) {
 
 int main(int argc, char * argv[]) {
     //configuredRun(argc, argv);
-    AutoRun();
-    //return AutoDisplay(argc, argv, TYPE_EE_AGG_AGENT, 0.001);
+    //AutoRun();
+    return AutoDisplay(argc, argv, TYPE_EE_AGG_AGENT, 0.01);
     //return AutoDisplay(argc, argv, TYPE_AGG_AGENT, 1.75,4,0.375);
 }

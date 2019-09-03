@@ -2,9 +2,9 @@
 import numpy as np
 import math
 
-start=21
-qt=80
-time=300000
+start=1
+qt=100
+#time=300000
 
 links = [101]
 sizes = [25,50,100,200]
@@ -19,14 +19,17 @@ newFilename = 'stat_'
 
 dist = 1
 
-def makeCluster(seed, pos):
+def makeCluster(seed, pos, manhattan):
     cluster = [seed]
     #print(pos)
     for p in range(len(pos)):
-        d = abs(seed[0]-pos[p][0]) + abs(seed[1]-pos[p][1])#math.sqrt(math.pow(seed[0]-pos[p][0],2)+math.pow(seed[1]-pos[p][1],2))
+        if(manhattan):
+            d = abs(seed[0]-pos[p][0]) + abs(seed[1]-pos[p][1])#math.sqrt(math.pow(seed[0]-pos[p][0],2)+math.pow(seed[1]-pos[p][1],2))
+        else:
+            d = max(abs(seed[0]-pos[p][0]),abs(seed[1]-pos[p][1]))
         #print(d)
         if(d <= dist and pos[p] not in cluster):
-            cluster.extend(makeCluster(pos[p],pos[:p]+pos[p+1:]))
+            cluster.extend(makeCluster(pos[p],pos[:p]+pos[p+1:],manhattan))
 
     return cluster
 
@@ -65,47 +68,58 @@ def processOpti25(directory,link,s):
 
 def processFolder(folder,s):
     print(folder)
+    tot = 0
     for nb in range(start,start+qt):
         try:
-            with open(folder+filename+str(nb)) as f:
-                f2 = open(folder+newFilename+str(nb), "w")
-                print(nb)
-                lines = f.readlines()
-                for line in lines:
-                    l = line.strip()
-                    l = line.split(' ')
-                
-                    pos = []
-                    words = set()
-                    t = int(l[0])
-            
-                    for i in range(1,len(l)):
-                        members = l[i].split('?')
-                        coord = members[0].split(',')
-                        pos.append((float(coord[0]),float(coord[1])))
-                        if(len(members)>1 and members[1].strip()!=''):
-                            words |= set([int(i) for i in members[1].split(',')])
-##                    if(0 in words):
-##                        words.remove(0)
+            f = open(folder+filename+str(nb))
+            lines = f.readlines()
+            line = lines[-1]
+            #l = line.strip()
+            l = line.split(' ')
 
-                    clusters = []
-                    while(len(pos)>0):
-                        clust = makeCluster(pos[0],pos[1:])
-                        if(len(clust)>1):
-                            clusters.append(clust)
-                        pos = [p for p in pos if p not in clust]
+            #MANHATTAN DIST
+            pos = []
+            words = set()
+            t = int(l[0])
+            for i in range(1,len(l)):
+                members = l[i].split('?')
+                coord = members[0].split(',')
+                pos.append((float(coord[0]),float(coord[1])))
 
-                    lengths=[len(c) for c in clusters]
-                    if(len(clusters)>0):
-                        var = [variation(c) for c in clusters]
-                    else:
-                        var = [-1]
-                    lengths.append(0)
-                    print(t,len(clusters),len(words),round(np.mean(lengths),3),max(lengths)/s,s-sum(lengths),np.mean(var),sep='\t',file=f2)
-                f2.close()
+            clusters = []
+            while(len(pos)>0):
+                clust = makeCluster(pos[0],pos[1:],True)
+                if(len(clust)>1):
+                    clusters.append(clust)
+                pos = [p for p in pos if p not in clust]
+
+            #CHEBYSHEV DIST
+            pos2 = []
+            words = set()
+            t = int(l[0])
+            for i in range(1,len(l)):
+                members = l[i].split('?')
+                coord = members[0].split(',')
+                pos2.append((float(coord[0]),float(coord[1])))
+
+            clusters2 = []
+            while(len(pos2)>0):
+                clust = makeCluster(pos2[0],pos2[1:],False)
+                if(len(clust)>1):
+                    clusters2.append(clust)
+                pos2 = [p for p in pos2 if p not in clust]
+
+            lengths=[len(c) for c in clusters]
+            lengths.append(0)
+
+            lengths2=[len(c) for c in clusters2]
+            lengths2.append(0)
+            tot += max(lengths) - max(lengths2)
+            f.close()
                         
         except IOError:
-            print("No file:",folder+filename+str(nb))    
+            print("No file:",folder+filename+str(nb))
+    print(tot/100)
 
 def makeStats(directory):
     for link in links:

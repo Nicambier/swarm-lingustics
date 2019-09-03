@@ -5,8 +5,8 @@
   <!-- * General configuration * -->
   <!-- ************************* -->
   <framework>
-    <system threads="7" />
-    <experiment length="3000"
+    <system threads="0" />
+    <experiment length="30000"
                 ticks_per_second="10"
                 random_seed="0" />
   </framework>
@@ -14,7 +14,8 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" aParam="1.75" bParam="4" link="2" mutation="0.001" timeStopCond="0" />
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="50" output="test.txt" timeStopCond="0" />
+  <!--loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" aParam="1.75" bParam="4" link="2" timeStopCond="0" /-->
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -39,7 +40,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1, 1, 1" center="0,0,0.5">
+  <arena size="1.4, 1.4, 1" center="0,0,0.5">
       
     <light id="l0"
            position="0,0,0.95"
@@ -73,7 +74,8 @@
     <qt-opengl>
       <user_functions library="build/language/loop_functions/word_loop_functions/libword_loop_functions" label="word_qtuser_functions" />
       <camera>
-        <placement idx="0" position="0,0,0.5" look_at="0,0,0" lens_focal_length="13" />
+        <placement idx="0" position="0,0,0.9" look_at="0,0,0" lens_focal_length="12" />
+        <placement idx="1" position="0,0,0.9" look_at="0,0,0" lens_focal_length="20" />
       </camera>
     </qt-opengl>
   </visualization>

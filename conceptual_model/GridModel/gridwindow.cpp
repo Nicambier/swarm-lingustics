@@ -47,7 +47,7 @@ void GridWindow::Display(World* w) {
 }
 
 void GridWindow::Play() {
-    for(int t=0; t<time; ++t) {
+    for(int t=0; t<time and !w->isFinished(); ++t) {
         w->Run();
 
         Display(w);

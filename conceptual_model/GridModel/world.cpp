@@ -25,8 +25,9 @@ World::World(int x, int y, int pop, AgentFactory* factory, unsigned int seed) {
     gsl_rng_env_setup();
     T = gsl_rng_default; // Generator setup
     rng = gsl_rng_alloc (T);
-    if(seed!=0)
-        gsl_rng_set(rng, seed);
+    if(seed==0)
+        seed = time(NULL);
+    gsl_rng_set(rng, seed);
 
     bool placed;
     Vector2D pos;
@@ -37,7 +38,7 @@ World::World(int x, int y, int pop, AgentFactory* factory, unsigned int seed) {
         while(!placed) {
             pos.x = random(size_x);
             pos.y = random(size_y);
-            
+
             if(!isOccupied(pos.x,pos.y)) {
                 agents.push_back(factory->GetNewAgent(this, pos));
                 map[pos.x][pos.y] = agents.back();
@@ -45,8 +46,8 @@ World::World(int x, int y, int pop, AgentFactory* factory, unsigned int seed) {
             }
         }
     }
-    
-    
+
+
 }
 
 World::~World() {

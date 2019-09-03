@@ -34,12 +34,12 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    int nBots;
    GetNodeAttributeOrDefault(t_tree, "nBots", nBots, nBots);
    
-   GetNodeAttributeOrDefault(t_tree, "aParam", a, a);
+   /*GetNodeAttributeOrDefault(t_tree, "aParam", a, a);
    GetNodeAttributeOrDefault(t_tree, "bParam", b, b);
    
    GetNodeAttributeOrDefault(t_tree, "link", link, link);
    
-   GetNodeAttributeOrDefault(t_tree, "mutation", m, m);
+   GetNodeAttributeOrDefault(t_tree, "mutation", m, m);*/
 
    /* Open the file for text writing */
    m_cOutFile.open(m_strOutFile.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -85,7 +85,7 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
     }
     
     PlaceBots(m_fArenaRadius);
-    ConfigBots();
+    //ConfigBots();
 }
 
 void CAggregation::PlaceBots(float m_fArenaRadius) {
@@ -121,7 +121,7 @@ void CAggregation::PlaceBots(float m_fArenaRadius) {
     
 }
 
-void CAggregation::ConfigBots() {
+/*void CAggregation::ConfigBots() {
     CKilobotEntity* kbEntity;    
     
     for(unsigned int i=0; i<bots.size(); ++i) {        
@@ -139,7 +139,7 @@ void CAggregation::ConfigBots() {
         GetSimulator().GetMedium<CKilobotCommunicationMedium>("kilocomm").SendOHCMessageTo(*kbEntity,&msg);
     }
     
-}
+}*/
 
 /****************************************/
 /****************************************/
@@ -173,12 +173,11 @@ void CAggregation::Destroy() {
 /****************************************/
 /****************************************/
 
-void CAggregation::PreStep() {
+/*void CAggregation::PreStep() {
     int clock = GetSpace().GetSimulationClock();
     if(clock<20)
         ConfigBots();
-   /* Nothing to do */
-}
+}*/
 
 void CAggregation::PostStep() {
     int clock = GetSpace().GetSimulationClock();

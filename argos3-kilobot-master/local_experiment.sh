@@ -1,13 +1,13 @@
 #!/bin/bash
     
 FILE='src/language/experiments/kilobot_naming_game.argos'
-FOLDER='weakNG'
+FOLDER='new_algo_halfturn'
 
 VERSIONS="2"
-SIZES="25 50 100"
+SIZES="25 50"
 ITER="20"
 
-ROOMS="1 1.4 2"
+ROOMS="1 1.4"
 
 #THESE WILL NOT APPLY FOR VERSIONS=2
 A_PARAM="0.00 0.25 0.50 0.75 1.00"
@@ -31,11 +31,11 @@ sed -i 's/<\/visualization>/<\/visualization-->/' ./tmp1
 
 for version in $VERSIONS
 do
-    sed -e 's/link="[^\"]*" mutation/link="'"$version"'" mutation/' tmp1 > tmp2
-    sleep 0.1
+    #sed -e 's/link="[^\"]*" mutation/link="'"$version"'" mutation/' tmp1 > tmp2
+    #sleep 0.1
     for swarm in $SIZES
     do
-        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp2 > tmp3
+        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp1 > tmp3
         set -- $ROOMS
         if [ $swarm -eq 25 ] 
         then 
@@ -57,13 +57,13 @@ do
             m=1
             for mut in $MUTATION
             do
-                sed -i 's/mutation="[^\"]*"/mutation="'"$mut"'"/' ./tmp4
+                #sed -i 's/mutation="[^\"]*"/mutation="'"$mut"'"/' ./tmp4
                 DIREC=$version'NG_s'$swarm'_m'$m
                 mkdir -p $FOLDER/$DIREC
                 for i in $(seq 1 1 $ITER)
                 do
                     sleep 0.5
-                    sed -e 's/output=".*" aParam/output="'"$FOLDER\/$DIREC"'\/out_'"$i"'" aParam/' tmp4 > tmp.argos
+                    sed -e 's/output=".*" time/output="'"$FOLDER\/$DIREC"'\/out_'"$i"'" time/' tmp4 > tmp.argos
                     sleep 0.5
                     while [ "$(pgrep -c argos3)" -gt 6 ] 
                     do
@@ -73,34 +73,34 @@ do
                 done
                 m="$((m+1))"
             done        
-        else
-            for aParam in $A_PARAM
-            do
-                sleep 0.1
-                sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp4 > tmpa
-                a=$(echo $aParam*100/1 | bc)
-                sleep 0.1
-                for bParam in $B_PARAM
-                do
-                    b=$(echo $bParam*100/1 | bc)
-                    sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmpa > tmpb
-                    sleep 0.1 
-                    
-                    DIREC=$version'NG_s'$swarm'_a'$a'_b'$b
-                    mkdir -p $FOLDER/$DIREC
-                    for i in $(seq 1 1 $ITER)
-                    do
-                        sleep 0.5 
-                        sed -e 's/output=".*" aParam/output="'"$FOLDER\/$DIREC"'\/out_'"$i"'" aParam/' tmpb > tmp.argos
-                        sleep 0.5
-                        while [ "$(pgrep -c argos3)" -gt 6 ] 
-                        do
-                            sleep 0.5
-                        done
-                        argos3 -c  tmp.argos &
-                    done
-                done
-            done
+#         else
+#             for aParam in $A_PARAM
+#             do
+#                 sleep 0.1
+#                 sed -e 's/aParam="[^\"]*"/aParam="'"$aParam"'"/' tmp4 > tmpa
+#                 a=$(echo $aParam*100/1 | bc)
+#                 sleep 0.1
+#                 for bParam in $B_PARAM
+#                 do
+#                     b=$(echo $bParam*100/1 | bc)
+#                     sed -e 's/bParam="[^\"]*"/bParam="'"$bParam"'"/' tmpa > tmpb
+#                     sleep 0.1 
+#                     
+#                     DIREC=$version'NG_s'$swarm'_a'$a'_b'$b
+#                     mkdir -p $FOLDER/$DIREC
+#                     for i in $(seq 1 1 $ITER)
+#                     do
+#                         sleep 0.5 
+#                         sed -e 's/output=".*" aParam/output="'"$FOLDER\/$DIREC"'\/out_'"$i"'" aParam/' tmpb > tmp.argos
+#                         sleep 0.5
+#                         while [ "$(pgrep -c argos3)" -gt 6 ] 
+#                         do
+#                             sleep 0.5
+#                         done
+#                         argos3 -c  tmp.argos &
+#                     done
+#                 done
+#             done
         fi
     done
 done

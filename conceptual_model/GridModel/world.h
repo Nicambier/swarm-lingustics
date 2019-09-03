@@ -18,10 +18,10 @@ class World {
         World(int x, int y, int pop, AgentFactory* factory, unsigned int seed=0);
         ~World();
         
-        bool MoveAgentTo(Agent* a, Vector2D pos);   
+        virtual bool MoveAgentTo(Agent* a, Vector2D pos);
         
         void BroadcastFrom(Vector2D from, int range, uint32_t msg);
-        void Run();
+        virtual void Run();
 
         bool isOccupied(int x, int y);
         uint32_t CellColour(int x, int y);
@@ -35,9 +35,11 @@ class World {
 
         double Evaluate();
 
+        virtual bool isFinished() {return false;}
+
         friend std::ostream & operator<<(std::ostream & Str, World const & w);
     
-    private:  
+    protected:
         int size_x;
         int size_y;
         int pop;

@@ -49,7 +49,7 @@ public:
     */
    
    virtual void PlaceBots(float m_fArenaRadius);
-   virtual void ConfigBots();
+   //virtual void ConfigBots();
    
    virtual void Reset();
 
@@ -62,7 +62,7 @@ public:
    /**
     * Performs actions right before a simulation step is executed.
     */
-   virtual void PreStep();
+   //virtual void PreStep();
    
    /*list< pair<float,float> > findCluster(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos);
    list< pair<float,float> > findCluster2(list< pair<float,float> >::iterator seed, list< pair<float,float> >& pos);

@@ -22,21 +22,32 @@ void CWORDQTUserFunctions::Draw(CKilobotEntity& c_kilobot_entity) {
     */
    
    CKilobotCommunicationEntity kilocomm = c_kilobot_entity.GetKilobotCommunicationEntity();
-   if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS)
-        lastWord[c_kilobot_entity.GetId()] = kilocomm.GetTxMessage()->data[2];
+   if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS) {
+        const message_t* temp = kilocomm.GetTxMessage();
+        if(temp->data[0]==WORD)
+            lastWord[c_kilobot_entity.GetId()] = temp;
+   }
    
-   float a,b;
+   uint8_t a;
+   uint8_t b;
+   uint8_t c;
+   uint8_t n;
    bool exists=false;
    if(lastWord.find(c_kilobot_entity.GetId())!=lastWord.end()) {
-       a = 1.25 + 0.25*(lastWord[c_kilobot_entity.GetId()]>>4);
-       b = 1.25 + 0.25*(lastWord[c_kilobot_entity.GetId()]%16);
-       exists = true;
+       const message_t* m = lastWord[c_kilobot_entity.GetId()];
+       if(m->data[0]==WORD){
+           a = m->data[2];
+           b = m->data[3];
+           c = m->data[4];
+           n = m->data[6];
+           exists = true;
+       }
    }
    
    if(exists) {
-        std::cout<<a<<" "<<b<<std::endl;
+        //std::cout<<a<<" "<<b<<std::endl;
         //char c[] = {p,'\0'};
-        std::string p = std::to_string((int) (a*100)) + " " + std::to_string((int) (b*100));
+        std::string p = std::to_string(c) + " " + std::to_string(a) + " " + std::to_string(b) + " "+ std::to_string(n);
         DrawText(CVector3(0.02, 0.02, 0.01),   // position
                     p.c_str()); // text
    }

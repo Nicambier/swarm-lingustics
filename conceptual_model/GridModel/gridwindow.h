@@ -10,6 +10,7 @@
 #include <QColor>
 #include <QPushButton>
 #include <unistd.h>
+#include <time.h>
 
 #include "world.h"
 

@@ -12,6 +12,8 @@
 #include <sstream>
 #include <set>
 
+#include "../../config.h"
+
 using namespace argos;
 
 class CWORDQTUserFunctions : public CQTOpenGLUserFunctions {
@@ -27,8 +29,7 @@ public:
    void Draw(CKilobotEntity& c_kilobot_entity);
    
 private:
-    
-    std::map<std::string,uint8_t> lastWord;
+    std::map<std::string,const message_t*> lastWord;
     
    
 };
