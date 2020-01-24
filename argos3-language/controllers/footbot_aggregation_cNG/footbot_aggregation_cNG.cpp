@@ -73,7 +73,7 @@ float CFootBotAggregation_cNG::ComputeProba(unsigned int n) {
         b = 1.25+0.25*(w/16);
     }
     //LOG << w << " " << a << " " << b << " " << endl;
-    return CFootBotAggregation::ComputeProba(n);
+    //return CFootBotAggregation::ComputeProba(n);
 }
 
 unsigned short int CFootBotAggregation_cNG::Noise(unsigned short int w) {

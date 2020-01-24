@@ -10,6 +10,7 @@
 
 class AgentFactory;
 class Agent;
+class Entity;
 struct Vector2D;
 
 class World {    
@@ -43,7 +44,7 @@ class World {
         int size_x;
         int size_y;
         int pop;
-        Agent*** map;
+        Entity*** map;
         std::list<Agent*> agents;
         int t;
 

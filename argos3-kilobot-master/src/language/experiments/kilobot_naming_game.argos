@@ -14,7 +14,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="50" output="test.txt" timeStopCond="0" />
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" timeStopCond="0" />
   <!--loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" aParam="1.75" bParam="4" link="2" timeStopCond="0" /-->
 
   <!-- *************** -->
@@ -40,7 +40,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1.4, 1.4, 1" center="0,0,0.5">
+  <arena size="1, 1, 1" center="0,0,0.5">
       
     <light id="l0"
            position="0,0,0.95"

@@ -4,7 +4,12 @@ using namespace std;
 
 EeAggAgent::EeAggAgent(World* w, Vector2D pos, double mutation_rate, bool weak, short int bits) : NgAggAgent(w, pos, 0, 0, 0, weak, bits), m(mutation_rate)
 {
-
+    /*float a = 2.38;
+    float b = 1.42;
+    float c = 0.62;
+    uint32_t init_word = (int (round(a*50))<<8) + int (round(b*50)) + (int (round(c*255))<<16);
+    lexicon.clear();
+    lexicon.push_back(init_word);*/
 }
 
 void EeAggAgent::ComputeN() {

@@ -1,6 +1,7 @@
 #include "agentfactory.h"
 #include "gridwindow.h"
 #include "world.h"
+#include "mazeworld.h"
 #include "erosion.h"
 #include <iostream>
 #include <fstream>
@@ -22,9 +23,9 @@ void run(int size_x, int size_y, int pop, AgentFactory factory, int time, int st
     for(int j=start; j<start+iter; ++j)
     {
         string file = dir+"out_"+to_string(j);
-        World w(size_x, size_y, pop, &factory);
+        Erosion w(size_x, size_y, pop, &factory);
         ofstream outfile (file);
-        for(int t=0; t<time; ++t) {
+        for(int t=0; t<time and !w.isFinished(); ++t) {
             if(t%200==0)
                 outfile<<w<<endl;
             w.Run();
@@ -47,38 +48,39 @@ int AutoDisplay(int argc, char * argv[], int type_agent, double p1=0, double p2=
     AgentFactory* factory = new AgentFactory(type_agent, p1, p2, p3);
     //AgentFactory* factory = new AgentFactory(type_agent, 0);
     factory->SetWeak(true);
-    Erosion w(71, 71, 200, factory);
+    //World w(50, 50, 100, factory);
+    //MazeWorld w(50, 50, 100, factory, 2, 0.50);
+    Erosion w(50, 50, 100, factory);
     QApplication app(argc,argv);
-    GridWindow window(w.GetSizeX(), w.GetSizeY(),w,200000);
+    GridWindow window(w.GetSizeX(), w.GetSizeY(),w,300000); //300000
     window.show();
-    //usleep(10000);
     delete factory;
     return app.exec();
 }
 
 void AutoRun() {
-    string folder = "../com_range1_8n/highDensity";
-    int x[] = {17,24,35,49};
-    int y[] = {17,24,35,49};
+    string folder = "../erosion/pace_locked";
+    int x[] = {25,35,43,50,56,61,66,71};
+    int y[] = {25,35,43,50,56,61,66,71};
 
     int types[] = {TYPE_EE_AGG_AGENT};
-    int pop[] = {25,50,100,200};
+    int pop[] = {25,50,75,100,125,150,175,200};
 
-    double aParam[] = {3.75};
-    double bParam[] = {0.75};
-    double cParam[] = {0.875};
+    double aParam[] = {3.4};
+    double bParam[] = {1.89};
+    double cParam[] = {0.6};
     /*double aParam[32];
     double bParam[32];
     double cParam[8];
     for(int ab = 0; ab<32; ++ab) {aParam[ab]=0.25 + ab*0.25; bParam[ab]=0.25 + ab*0.25;}
     for(int c = 0; c<8; ++c) {cParam[c]=c*0.125;}*/
 
-    double mParam[] = {0,0.01,0.001};
+    double mParam[] = {0.01};
 
     bool weak = true;
     string strength = "";
 
-    int time = 300000;
+    int time = 3000000;
     int start = 1;
     int runs = 20;
 
@@ -187,7 +189,8 @@ void configuredRun(int argc, char * argv[]) {
 
 int main(int argc, char * argv[]) {
     //configuredRun(argc, argv);
-    //AutoRun();
-    return AutoDisplay(argc, argv, TYPE_EE_AGG_AGENT, 0.01);
-    //return AutoDisplay(argc, argv, TYPE_AGG_AGENT, 1.75,4,0.375);
+    AutoRun();
+    //return AutoDisplay(argc, argv, TYPE_EE_AGG_AGENT, 0.01);
+    //return AutoDisplay(argc, argv, TYPE_AGENT);
+    //return AutoDisplay(argc, argv, TYPE_AGG_AGENT, 3.4,1.89,0.6);
 }

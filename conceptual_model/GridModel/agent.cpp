@@ -2,10 +2,8 @@
 
 using namespace std;
 
-Agent::Agent(World* w, Vector2D pos) {
-    world = w;
+Agent::Agent(World* w, Vector2D pos): Entity(w,pos) {
     broadcast_range = 1;
-    this->pos = pos;
 }
 
 Agent::~Agent() {
@@ -30,32 +28,26 @@ void Agent::Receive(uint32_t msg) {
     new_msgs.push_back(msg);
 }
 
-Vector2D Agent::GetPos() const {
-    return pos;
-}
-
-void Agent::SetPos(Vector2D newPos) {
-    pos = newPos;
-}
-
 void Agent::RandomWalk() {
-    int dir = world->random(4);
-    Vector2D newPos = pos;
-    switch(dir) {
-        case 0:
-            ++newPos.x;
-            break;
-        case 1:
-            --newPos.x;
-            break;
-        case 2:
-            ++newPos.y;
-            break;
-        case 3:
-            --newPos.y;
-            break;            
+    if(world->GetTime()>5000) {
+        int dir = world->random(4);
+        Vector2D newPos = pos;
+        switch(dir) {
+            case 0:
+                ++newPos.x;
+                break;
+            case 1:
+                --newPos.x;
+                break;
+            case 2:
+                ++newPos.y;
+                break;
+            case 3:
+                --newPos.y;
+                break;
+        }
+        world->MoveAgentTo(this,newPos);
     }
-    world->MoveAgentTo(this,newPos);
 }
 
 string Agent::toString() const {

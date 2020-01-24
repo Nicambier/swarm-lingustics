@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../config.h"
-#include "../conversion.c"
 
 //FIXED VALUES
 #define PI_TURN 40
@@ -13,12 +12,18 @@
 
 
 //PARAMETERS TO SET
-#define TIMESTEP 80
+#define TIMESTEP 40
 #define MUTATIONS 0.01
 #define RHO 0
 #define JOIN_TURN 0 //set to 1 if you want the robots to automatically turn around when they are joining an aggregate
 
-//#define MAX_DIST 2
+#define LINK EVO_LINK
+
+struct Word{
+    uint8_t aByte;
+    uint8_t bByte;
+    uint8_t cByte;
+};
 
 int t, turn_steps;
 unsigned short int STAY, TURN;
@@ -27,20 +32,25 @@ message_t message;
 double a,b,c;
 double m;
 
-uint32_t lexicon[200];
+struct Word lexicon[200];
 uint8_t ids[200];
-uint32_t msgs[200];
+struct Word msgs[200];
 int lexicon_size, msgs_size, n;
-
-unsigned char link;
 
 void setup()
 {    
-    a = 0;
-    b = 0;
-    c = 0;
-    m = MUTATIONS;
-    link = EVO_LINK;
+    if(LINK==EVO_LINK) {
+        a = 0;
+        b = 0;
+        c = 0;
+        m = MUTATIONS;
+    }
+    else {
+        a = 1.75;
+        b = 4;
+        c = 0.49;
+        m = 0;
+    }    
     
     msgs_size = 0;
     message.data[0] = NONE;
@@ -51,9 +61,7 @@ void setup()
     
     rand_seed(rand_hard());
     
-    uint32_t init_word = rand_soft();
-    init_word+= rand_soft() << 8;
-    init_word+= rand_soft() << 16;
+    struct Word init_word = {rand_soft(),rand_soft(),rand_soft()};
     lexicon[0] = init_word;
     lexicon_size = 1;
     //lastWord=lexicon[0];
@@ -83,24 +91,30 @@ int random_turn()
     return  theta*PI_TURN/PI;
 }
 
-void convertParams(uint32_t val)
+void convertParams(struct Word val)
 {
-    a = 0.02*((val>>8) & 255);
-    b = 0.02*(val & 255);
-    c = 0.0039*(val>> 16);
+    a = 0.02*(val.aByte);
+    b = 0.02*(val.bByte);
+    c = 0.0039*(val.cByte);
     
     //activate the following line if LEDS are working
-    //set_color(RGB((int) (3*c), (int) (a/1.7), (int) (b/1.7)));
+    set_color(RGB((int) (3*c), (int) (a/1.7), (int) (b/1.7)));
 }
 
-uint32_t noise(uint32_t w)
+struct Word noise(struct Word w)
 {
     uint8_t i;
     for(i=0; i<24; ++i)
     {
         double r = ((double) ((rand_soft()<<8)+rand_soft()))/(double) 65535;
-        if(r < m)
-            w = w ^ (uint32_t) pow(2,i);
+        if(r < m) {
+            if(i<8)
+                w.aByte = w.aByte ^ (uint8_t) pow(2,i);
+            else if(i<16)
+                w.bByte = w.bByte ^ (uint8_t) pow(2,i%8);
+            else
+                w.cByte = w.cByte ^ (uint8_t) pow(2,i%8);
+        }
     }
     return w;
 }
@@ -113,9 +127,9 @@ void speak(unsigned char activate)
         message.type = NORMAL;
         int r = rand_soft()%lexicon_size;
         message.data[0] = WORD;
-        message.data[2] = (lexicon[r] >> 8) & 255;
-        message.data[3] = lexicon[r] & 255;
-        message.data[4] = lexicon[r] >> 16;
+        message.data[2] = lexicon[r].aByte;
+        message.data[3] = lexicon[r].bByte;
+        message.data[4] = lexicon[r].cByte;
         // It's important that the CRC is computed after the data has been set;
         // otherwise it would be wrong and the message would be dropped by the
         // receiver.
@@ -134,13 +148,12 @@ void hear()
 {    
     if(msgs_size>0) {
         uint8_t inside = 0;
-        uint32_t w=msgs[rand_soft()%msgs_size];
-        if(link==EVO_LINK)
-            w=noise(w);
+        struct Word w=msgs[rand_soft()%msgs_size];
+        w=noise(w);
 
         int j = 0;
         while(j<lexicon_size && !inside) {
-            if(lexicon[j]==w) {
+            if(lexicon[j].aByte==w.aByte && lexicon[j].bByte==w.bByte && lexicon[j].cByte==w.cByte) {
                 //++scores[j];
                 inside = 1;
             }
@@ -193,7 +206,7 @@ void leave(uint8_t first_time) {
 void join(uint8_t first_time) {
     STAY=1;
     speak(1);
-    set_color(RGB(0, 3, 0));
+    //set_color(RGB(0, 3, 0));
     if(first_time && JOIN_TURN) {
         turn(1);
         turn_steps=PI_TURN;
@@ -220,7 +233,7 @@ void loop()
             hear();
             msgs_size = 0; //delete messages;   
             //UPDATE PARAMETERS
-            if(link==EVO_LINK) {
+            if(LINK==EVO_LINK) {
                 if(lexicon_size>=1) {
                     convertParams(lexicon[rand_soft()%lexicon_size]);
                 }
@@ -238,7 +251,11 @@ void loop()
             else
             {
                 //TRANSITION
-                double p = (1-c)+c*(1-exp(-a*n));
+                double p;
+                if(LINK==EVO_LINK)
+                    p = (1-c)+c*(1-exp(-a*n));
+                else
+                    p = 0.03+c*(1-exp(-a*n));
                 double r = ((double) ((rand_soft()<<8)+rand_soft()))/(double) 65535; //generates random number on 16 bits for accuracy
                 if(r < p) {
                     join(n>0);
@@ -271,9 +288,10 @@ void message_rx(message_t *m, distance_measurement_t *d)
     if(m->data[0] == WORD && t%TIMESTEP>=(TIMESTEP-10)) //receive only during the last 10 timesteps before the tick
     {
         short int idx = idxOf(ids,m->data[1],msgs_size);
-        uint32_t word = m->data[2]<<8;
-        word += m->data[3];
-        word += m->data[4]<<16;
+        struct Word word;
+        word.aByte = m->data[2];
+        word.bByte = m->data[3];
+        word.cByte = m->data[4];
         msgs[idx]=word;
         ids[idx]=m->data[1];
         if(idx >= msgs_size)

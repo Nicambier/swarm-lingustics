@@ -25,8 +25,8 @@ for i in range(len(sizes)):
 if(boxplot):
     col=["green","blue","red"]
     ls=["-","-","-","--"]
-    lab=["CE m=0.01","CE m=0.001","Fixed optimal"]
-    folders = ['highDensity2/103wpSIZEm10/','highDensity2/103wpSIZEm1/','optiHigh2/101pSIZEopti/']
+    lab=["PA-CE m=0.01","PA-CE m=0.001","Fixed optimal"]
+    folders = ['lowDensity2/103wpSIZEm10/','lowDensity2/103wpSIZEm1/','optiLow2/101pSIZEopti/']
 else:
     col=["green","blue","red","orange"]
     ls=["-","-","-","--"]
@@ -134,7 +134,7 @@ print("\end{tabular}")
 axes[0][0].set_ylabel('Cluster metric')
 axes[1][0].set_ylabel('Lexicon size')
 axes[1][len(sizes)-1].legend(dummyLines,["Clusters","Free Agents"],loc='lower left', bbox_to_anchor=(0.55, 0.75), ncol=1, fancybox=True, shadow=True, fontsize=10)
-lgd = axes[1][1].legend(axes[0][0].get_lines(),lab,loc='lower right', bbox_to_anchor=(2.3, -0.5), ncol=4, fancybox=True, shadow=True, fontsize=12)
+lgd = axes[1][1].legend(axes[0][0].get_lines(),lab,loc='lower right', bbox_to_anchor=(2.2, -0.5), ncol=4, fancybox=True, shadow=True, fontsize=12)
 art=[lgd]
 if(boxplot):
     plt.savefig(directory+'/timeEvol_boxplot.png',additional_artists=art,bbox_inches='tight')

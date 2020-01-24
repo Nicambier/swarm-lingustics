@@ -20,8 +20,8 @@
   <!-- *************** -->
   <controllers>
 
-    <footbot_aggregation_cNG_controller id="fdc"
-                                  library="../build/controllers/footbot_aggregation_cNG/libfootbot_aggregation_cNG.so">
+    <footbot_aggregation_nNG_controller id="fdc"
+                                  library="../build/controllers/footbot_aggregation_nNG/libfootbot_aggregation_nNG.so">
       <actuators>
         <differential_steering implementation="default" />
         <range_and_bearing implementation="default" />
@@ -30,15 +30,15 @@
         <footbot_proximity implementation="default" show_rays="false" />
         <range_and_bearing implementation="medium" medium="rab" show_rays="false" />
       </sensors>
-      <params minDist="70" aParam="1.75" bParam="4" leaveTurns="1" stayTurns="1" walkTurns="1" rule="3" noise="0.1" ntype="shannon"/>
-    </footbot_aggregation_cNG_controller>
+      <params minDist="70" aParam="2.25" bParam="3.5" leaveTurns="1" stayTurns="1" walkTurns="1" rule="3" noise="0.1" ntype="shannon"/>
+    </footbot_aggregation_nNG_controller>
 
   </controllers>
 
    <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="10, 10, 1" center="0,0,0.5" />
+  <arena size="20, 20, 1" center="0,0,0.5" />
 
   <!-- ******************* -->
   <!-- * Physics engines * -->

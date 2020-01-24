@@ -29,6 +29,7 @@ private:
     void cellActivation(int x, int y, uint32_t);
     void Display(World* w);
     void Play();
+    void Save();
 public:
     GridWindow(int size_x, int size_y, World& world, int t=0);
 

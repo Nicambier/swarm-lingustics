@@ -27,8 +27,8 @@ GridWindow::GridWindow(int size_x, int size_y, World& world, int t): w(&world), 
             cellActivation(i,j,65535);
         }
     }
+    grid->setShowGrid(false);
     Display(w);
-    //show();
 }
 
 void GridWindow::cellActivation(int x, int y, uint32_t c){
@@ -58,6 +58,27 @@ void GridWindow::Play() {
     }
 }
 
+void GridWindow::Save()
+{
+    int i = 1;
+    for(int t=0; t<time and !w->isFinished(); ++t) {
+        w->Run();
+
+        if(t%10==0) {
+            Display(w);
+            QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+            //usleep(100000);
+            update();
+            QPixmap pixmap(grid->size());
+            grid->render(&pixmap);
+            std::string path = "../infection100/test-"+std::to_string(i)+".png";
+            pixmap.save(QString(path.c_str()),"PNG",100);
+            ++i;
+        }
+    }
+}
+
 void GridWindow::onClicked() {
     Play();
+    //Save();
 }

@@ -1,5 +1,6 @@
 #include "world.h"
 #include "agent.h"
+#include "entity.h"
 #include "agentfactory.h"
 
 #include <gridwindow.h>
@@ -14,9 +15,9 @@ World::World(int x, int y, int pop, AgentFactory* factory, unsigned int seed) {
     
     t=0;
     
-    map = new Agent**[size_x];
+    map = new Entity**[size_x];
     for(int i=0; i<size_x; ++i) {
-        map[i] = new Agent*[size_y];
+        map[i] = new Entity*[size_y];
         for(int j=0; j<size_y; ++j)
             map[i][j] = 0;
     }

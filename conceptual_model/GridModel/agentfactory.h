@@ -3,12 +3,14 @@
 
 #include "eeaggagent.h"
 #include "randomaggagent.h"
+#include "infectiousagent.h"
 
 #define TYPE_AGENT 100
 #define TYPE_AGG_AGENT 101
 #define TYPE_NG_AGG_AGENT 102
 #define TYPE_EE_AGG_AGENT 103
 #define TYPE_RANDOM_AGG_AGENT 104
+#define TYPE_INFECTIOUS_AGENT 105
 
 class AgentFactory
 {

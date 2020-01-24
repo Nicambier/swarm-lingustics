@@ -11,7 +11,11 @@ HEADERS += \
     eeaggagent.h \
     agent.h \
     world.h \
-    randomaggagent.h
+    randomaggagent.h \
+    erosion.h \
+    infectiousagent.h \
+    mazeworld.h \
+    entity.h
 
 SOURCES += \
     gridwindow.cpp \
@@ -22,4 +26,8 @@ SOURCES += \
     main.cpp \
     agent.cpp \
     world.cpp \
-    randomaggagent.cpp
+    randomaggagent.cpp \
+    erosion.cpp \
+    infectiousagent.cpp \
+    mazeworld.cpp \
+    entity.cpp

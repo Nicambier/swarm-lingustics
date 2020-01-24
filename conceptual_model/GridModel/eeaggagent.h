@@ -2,6 +2,8 @@
 #define EEAGGAGENT_H
 
 #include "ngaggagent.h"
+#include "math.h"
+#include "stdio.h"
 
 class EeAggAgent : public NgAggAgent
 {
