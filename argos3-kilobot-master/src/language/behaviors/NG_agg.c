@@ -12,7 +12,7 @@
 
 
 //PARAMETERS TO SET
-#define TIMESTEP 40
+#define TIMESTEP 100
 #define MUTATIONS 0.01
 #define RHO 0
 #define JOIN_TURN 0 //set to 1 if you want the robots to automatically turn around when they are joining an aggregate
@@ -46,8 +46,8 @@ void setup()
         m = MUTATIONS;
     }
     else {
-        a = 1.75;
-        b = 4;
+        a = 1.70;
+        b = 3.89;
         c = 0.49;
         m = 0;
     }    
@@ -81,14 +81,16 @@ void reset()
 
 int random_turn()
 {
-    double val, theta, u, q;
+    /*double val, theta, u, q;
     //double c = RHO;
     q = 0.5;
-    u = (double) ((rand_soft()<<8)+rand_soft())/(double) 65536;
+    u = ((rand_soft()<<8)+rand_soft())/65536.0;
     val = (1.0 - RHO) / (1.0 + RHO);
     theta = 2 * atan(val * tan(PI * (u - q)));
     
-    return  theta*PI_TURN/PI;
+    return  theta*PI_TURN/PI;*/
+    int sign = rand_soft()%2?-1:1;
+    return sign * (rand_soft()%PI_TURN);
 }
 
 void convertParams(struct Word val)
@@ -98,7 +100,7 @@ void convertParams(struct Word val)
     c = 0.0039*(val.cByte);
     
     //activate the following line if LEDS are working
-    set_color(RGB((int) (3*c), (int) (a/1.7), (int) (b/1.7)));
+    set_color(RGB((int) (val.cByte/85), (int) (val.aByte/85), (int) (val.bByte/85)));
 }
 
 struct Word noise(struct Word w)
@@ -106,7 +108,7 @@ struct Word noise(struct Word w)
     uint8_t i;
     for(i=0; i<24; ++i)
     {
-        double r = ((double) ((rand_soft()<<8)+rand_soft()))/(double) 65535;
+        double r = ((rand_soft()<<8)+rand_soft())/65535.0;;
         if(r < m) {
             if(i<8)
                 w.aByte = w.aByte ^ (uint8_t) pow(2,i);
@@ -242,7 +244,7 @@ void loop()
             if(STAY) { 
                 //TRANSITION
                 double p = exp(-b*n);
-                double r = ((double) ((rand_soft()<<8)+rand_soft()))/(double) 65535; //generates random number on 16 bits for accuracy
+                double r = ((rand_soft()<<8)+rand_soft())/65535.0; //generates random number on 16 bits for accuracy
                 if(r < p) {
                     leave(n>1);
                 } else
@@ -256,7 +258,7 @@ void loop()
                     p = (1-c)+c*(1-exp(-a*n));
                 else
                     p = 0.03+c*(1-exp(-a*n));
-                double r = ((double) ((rand_soft()<<8)+rand_soft()))/(double) 65535; //generates random number on 16 bits for accuracy
+                double r = ((rand_soft()<<8)+rand_soft())/65535.0; //generates random number on 16 bits for accuracy
                 if(r < p) {
                     join(n>0);
                 } else

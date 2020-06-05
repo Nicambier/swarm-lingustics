@@ -24,7 +24,7 @@ Agent* AgentFactory::GetNewAgent(World* w, Vector2D pos)
         return new RandomAggAgent(w, pos);
         break;
     case TYPE_INFECTIOUS_AGENT:
-        return new InfectiousAgent(65535, w, pos, p1, weak,24);
+        return new InfectiousAgent(w, pos, p1, weak,24);
         break;
     }
     return nullptr;

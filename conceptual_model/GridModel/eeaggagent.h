@@ -16,6 +16,8 @@ public:
     virtual void ComputeN();
     virtual void UpdateParameters();
 
+    virtual void SetNoise(double noise);
+
     uint32_t Mutate(uint32_t word);
 };
 

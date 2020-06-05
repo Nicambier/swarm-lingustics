@@ -15,7 +15,8 @@ HEADERS += \
     erosion.h \
     infectiousagent.h \
     mazeworld.h \
-    entity.h
+    entity.h \
+    infection.h
 
 SOURCES += \
     gridwindow.cpp \
@@ -30,4 +31,5 @@ SOURCES += \
     erosion.cpp \
     infectiousagent.cpp \
     mazeworld.cpp \
-    entity.cpp
+    entity.cpp \
+    infection.cpp

@@ -1,21 +1,21 @@
 #!/bin/bash
     
 FILE='src/language/experiments/kilobot_naming_game.argos'
-FOLDER='paper_results'
+FOLDER='new_paper_results'
 
 VERSIONS="2"
-SIZES="25"
-ITER="1"
+SIZES="100"
+ITER="20"
 
-ROOMS="1 1.4 2"
+ROOMS="0.7 1.0 1.4"
 
 #THESE WILL NOT APPLY FOR VERSIONS=2
-A_PARAM="1.75"
-B_PARAM="4.00"
+A_PARAM="1.70"
+B_PARAM="3.89"
 #"1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.25 4.50 4.75 5.00"
 
 #THESE WILL ONLY APPLY FOR VERSIONS=2
-MUTATION="0.01"
+MUTATION="0.04"
 
 mkdir -p $FOLDER
 
@@ -35,26 +35,26 @@ do
     sleep 0.1
     for swarm in $SIZES
     do
-        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp1 > tmp3
-        set -- $ROOMS
-        if [ $swarm -eq 25 ] 
-        then 
-            sed -e 's/arena size="1, 1, 1"/arena size="'"$1"', '"$1"', 1"/' tmp3 > tmp4
-            #sed -e 's/aParam="1" bParam="2" leave/aParam="2.25" bParam="3.5" leave/' tmp4 > tmp5
-        elif [ $swarm -eq 50 ]
-        then 
-            sed -e 's/arena size="1, 1, 1"/arena size="'"$2"', '"$2"', 1"/' tmp3 > tmp4
-            #sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="2" leave/' tmp4 > tmp5
-        elif [ $swarm -eq 100 ]
-        then 
-            sed -e 's/arena size="1, 1, 1"/arena size="'"$3"', '"$3"', 1"/' tmp3 > tmp4
-            #sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="1.25" leave/' tmp4 > tmp5
-        fi
+        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp1 > tmp4
+#         set -- $ROOMS
+#         if [ $swarm -eq 25 ] 
+#         then 
+#             sed -e 's/arena size="1, 1, 1"/arena size="'"$1"', '"$1"', 1"/' tmp3 > tmp4
+#             #sed -e 's/aParam="1" bParam="2" leave/aParam="2.25" bParam="3.5" leave/' tmp4 > tmp5
+#         elif [ $swarm -eq 50 ]
+#         then 
+#             sed -e 's/arena size="1, 1, 1"/arena size="'"$2"', '"$2"', 1"/' tmp3 > tmp4
+#             #sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="2" leave/' tmp4 > tmp5
+#         elif [ $swarm -eq 100 ]
+#         then 
+#             sed -e 's/arena size="1, 1, 1"/arena size="'"$3"', '"$3"', 1"/' tmp3 > tmp4
+#             #sed -e 's/aParam="1" bParam="2" leave/aParam="1.25" bParam="1.25" leave/' tmp4 > tmp5
+#         fi
         sleep 0.5 
         
         if [ $version -eq 2 ]
         then
-            m=1
+            m=4
             for mut in $MUTATION
             do
                 #sed -i 's/mutation="[^\"]*"/mutation="'"$mut"'"/' ./tmp4

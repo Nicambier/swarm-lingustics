@@ -23,7 +23,7 @@ def makeCluster(seed, pos):
     cluster = [seed]
     #print(pos)
     for p in range(len(pos)):
-        d = abs(seed[0]-pos[p][0]) + abs(seed[1]-pos[p][1])#math.sqrt(math.pow(seed[0]-pos[p][0],2)+math.pow(seed[1]-pos[p][1],2))
+        d = max(abs(seed[0]-pos[p][0]),abs(seed[1]-pos[p][1]))#abs(seed[0]-pos[p][0]) + abs(seed[1]-pos[p][1])
         #print(d)
         if(d <= dist and pos[p] not in cluster):
             cluster.extend(makeCluster(pos[p],pos[:p]+pos[p+1:]))

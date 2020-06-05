@@ -50,7 +50,7 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    ////////////////////////////////////////////////////////////////////////////////// CREATION AND POSITIONING OF THE ARENA WALLS////////////////////////////////////////////////////////////////////////////////
     CVector3 arena_size = GetSpace().GetArenaSize();
     float m_fArenaRadius = Min(arena_size[0],arena_size[1])/2;
-    /*switch(nBots) {
+    switch(nBots) {
         case 25:
             m_fArenaRadius = 0.35;
             break;
@@ -60,7 +60,7 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
         case 100:
             m_fArenaRadius = 0.7;
             break;
-    }*/
+    }
     unsigned int m_unNumArenaWalls = 20;
 
     CRadians wall_angle = CRadians::TWO_PI/m_unNumArenaWalls;CVector3 wall_size(0.01, 2.0*m_fArenaRadius*Tan(CRadians::PI/m_unNumArenaWalls), 0.05);

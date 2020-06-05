@@ -70,6 +70,7 @@ plt.axes().set_ylabel("Cluster metric")
 plt.axes().set_xticklabels(sizes)
 plt.axes().set_xticks([1.5+ (3*x) for x in range(len(sizes))])
 plt.xlim(0,3*len(sizes))
+plt.ylim(0.5,1.01)
 
 hB, = plt.plot([1,1],'-',color = col[0])
 hR, = plt.plot([1,1],'-',color = col[1])

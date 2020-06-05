@@ -29,25 +29,23 @@ void Agent::Receive(uint32_t msg) {
 }
 
 void Agent::RandomWalk() {
-    if(world->GetTime()>5000) {
-        int dir = world->random(4);
-        Vector2D newPos = pos;
-        switch(dir) {
-            case 0:
-                ++newPos.x;
-                break;
-            case 1:
-                --newPos.x;
-                break;
-            case 2:
-                ++newPos.y;
-                break;
-            case 3:
-                --newPos.y;
-                break;
-        }
-        world->MoveAgentTo(this,newPos);
+    int dir = world->random(4);
+    Vector2D newPos = pos;
+    switch(dir) {
+        case 0:
+            ++newPos.x;
+            break;
+        case 1:
+            --newPos.x;
+            break;
+        case 2:
+            ++newPos.y;
+            break;
+        case 3:
+            --newPos.y;
+            break;
     }
+    world->MoveAgentTo(this,newPos);
 }
 
 string Agent::toString() const {

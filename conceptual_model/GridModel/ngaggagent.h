@@ -45,6 +45,7 @@ public:
     }
 
     virtual std::string toString() const;
+    virtual std::vector<uint32_t> GetLexicon() const;
 };
 
 #endif // NGAGGAGENT_H

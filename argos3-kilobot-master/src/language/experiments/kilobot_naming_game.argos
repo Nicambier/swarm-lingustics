@@ -30,7 +30,6 @@
       </actuators>
       <sensors>
         <kilobot_communication implementation="default" medium="kilocomm" show_rays="true" />
-        <kilobot_light implementation="rot_z_only" />
       </sensors>
       <params behavior="build/language/behaviors/NG_agg" />
     </kilobot_controller>
@@ -40,15 +39,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="1, 1, 1" center="0,0,0.5">
-      
-    <light id="l0"
-           position="0,0,0.95"
-           orientation="0,0,0"
-           color="yellow"
-           intensity="1.0"
-           medium="leds"/>
-           
+  <arena size="2, 2, 1" center="0,0,0.5">           
 
   </arena>
 
