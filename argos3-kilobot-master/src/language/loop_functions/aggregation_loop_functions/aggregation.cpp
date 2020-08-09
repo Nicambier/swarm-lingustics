@@ -31,9 +31,6 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
    GetNodeAttribute(t_tree, "output", m_strOutFile);
    GetNodeAttributeOrDefault(t_tree, "timeStopCond", timeStopCond, timeStopCond);
    
-   int nBots;
-   GetNodeAttributeOrDefault(t_tree, "nBots", nBots, nBots);
-   
    /*GetNodeAttributeOrDefault(t_tree, "aParam", a, a);
    GetNodeAttributeOrDefault(t_tree, "bParam", b, b);
    
@@ -47,48 +44,63 @@ void CAggregation::Init(TConfigurationNode& t_tree) {
       THROW_ARGOSEXCEPTION("Error opening file \"" << m_strOutFile << "\": " << ::strerror(errno));
    }
    
+   unsigned int nBots;
+   GetNodeAttributeOrDefault(t_tree, "nBots", nBots, nBots);
+   double cornerProportion;
+   GetNodeAttributeOrDefault(t_tree, "cornerProportion", cornerProportion, cornerProportion);
+   
    ////////////////////////////////////////////////////////////////////////////////// CREATION AND POSITIONING OF THE ARENA WALLS////////////////////////////////////////////////////////////////////////////////
     CVector3 arena_size = GetSpace().GetArenaSize();
-    float m_fArenaRadius = Min(arena_size[0],arena_size[1])/2;
-    switch(nBots) {
-        case 25:
-            m_fArenaRadius = 0.35;
-            break;
-        case 50:
-            m_fArenaRadius = 0.5;
-            break;
-        case 100:
-            m_fArenaRadius = 0.7;
-            break;
-    }
-    unsigned int m_unNumArenaWalls = 20;
 
-    CRadians wall_angle = CRadians::TWO_PI/m_unNumArenaWalls;CVector3 wall_size(0.01, 2.0*m_fArenaRadius*Tan(CRadians::PI/m_unNumArenaWalls), 0.05);
+    unsigned int cornerWalls = 5;
+    double cornerRadius = cornerProportion * Min(arena_size[0],arena_size[1]);
+    
+    CQuaternion wall_orientation;
+    wall_orientation.FromEulerAngles(CRadians::ZERO, CRadians::ZERO, CRadians::ZERO );
+    CBoxEntity* box = new CBoxEntity("west_wall", CVector3(0,-arena_size[1]/2,0), wall_orientation, false, CVector3(arena_size[0]-2*cornerRadius,0.01,0.05), (Real)1.0 );
+    AddEntity( *box );
+    box = new CBoxEntity("east_wall", CVector3(0,arena_size[1]/2,0), wall_orientation, false, CVector3(arena_size[0]-2*cornerRadius,0.01,0.05), (Real)1.0 );
+    AddEntity( *box );
+    box = new CBoxEntity("south_wall", CVector3(-arena_size[0]/2,0,0), wall_orientation, false, CVector3(0.01,arena_size[1]-2*cornerRadius,0.05), (Real)1.0 );
+    AddEntity( *box );
+    box = new CBoxEntity("north_wall", CVector3(arena_size[0]/2,0,0), wall_orientation, false, CVector3(0.01,arena_size[1]-2*cornerRadius,0.05), (Real)1.0 );
+    AddEntity( *box );
+
+    PlaceQuarterCircleWall(CVector3(arena_size[0]/2-cornerRadius,arena_size[1]/2-cornerRadius,0),cornerRadius,cornerWalls,0);
+    PlaceQuarterCircleWall(CVector3(-arena_size[0]/2+cornerRadius,arena_size[1]/2-cornerRadius,0),cornerRadius,cornerWalls,1);
+    PlaceQuarterCircleWall(CVector3(-arena_size[0]/2+cornerRadius,-arena_size[1]/2+cornerRadius,0),cornerRadius,cornerWalls,2);
+    PlaceQuarterCircleWall(CVector3(arena_size[0]/2-cornerRadius,-arena_size[1]/2+cornerRadius,0),cornerRadius,cornerWalls,3);
+    
+    CKilobotEntity* pcKB;
+    stayArray = new bool[nBots];
+    for(unsigned int i=0; i<nBots; ++i) {  
+        stayArray[i]=false;
+        pcKB = new CKilobotEntity("kb_" + ToString(i),"kbc",CVector3(0,0,0),CQuaternion(0,0,0,0),0.07);
+        bots.push_back(pcKB);
+        AddEntity(*pcKB);
+    }
+    
+    PlaceBots(arena_size, cornerRadius);
+    //ConfigBots();
+}
+
+void CAggregation::PlaceQuarterCircleWall(CVector3 pos, double radius, unsigned int nbWalls, unsigned int quadrant) {
+    CRadians wall_angle = CRadians::TWO_PI/(4*nbWalls);CVector3 wall_size(0.01, 2.0*radius*Tan(CRadians::PI/(4*nbWalls)), 0.05);
     ostringstream entity_id;
-    for( UInt32 i = 0; i < m_unNumArenaWalls; i++ ) {
-        entity_id.str("");entity_id << "wall_" << i;
+    for( UInt32 i = quadrant*nbWalls; i <= quadrant*nbWalls + nbWalls; i++ ) {
+        entity_id.str("");entity_id << "wall_" <<quadrant<< i;
         CRadians wall_rotation = wall_angle*i;
         
-        CVector3 wall_position( m_fArenaRadius*Cos(wall_rotation), m_fArenaRadius*Sin(wall_rotation), 0 );
+        CVector3 wall_position(pos[0] + radius*Cos(wall_rotation), pos[1] + radius*Sin(wall_rotation), 0 );
         CQuaternion wall_orientation;
         wall_orientation.FromEulerAngles( wall_rotation, CRadians::ZERO, CRadians::ZERO );
         
         CBoxEntity* box = new CBoxEntity(entity_id.str(), wall_position, wall_orientation, false, wall_size, (Real)1.0 );
         AddEntity( *box );
     }
-    
-    CKilobotEntity* pcKB;
-    for(int i=0; i<nBots; ++i) {        
-        pcKB = new CKilobotEntity("kb_" + ToString(i),"kbc",CVector3(0,0,0),CQuaternion(0,0,0,0),0.07);
-        bots.push_back(pcKB);
-        AddEntity(*pcKB);
-    }
-    
-    PlaceBots(m_fArenaRadius);
-    //ConfigBots();
 }
 
-void CAggregation::PlaceBots(float m_fArenaRadius) {
+void CAggregation::PlaceBots(CVector3 arenaSize, double cornerRadius) {
     
     CVector3 cPosition;
     CQuaternion cOrientation;
@@ -102,16 +114,17 @@ void CAggregation::PlaceBots(float m_fArenaRadius) {
         
         pcKB = bots[i];
         do {
-            CRadians cRandomAngle = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
-            Real cRandomRadius = m_pcRNG->Uniform(CRange<Real>(-m_fArenaRadius,m_fArenaRadius));
+            double x = m_pcRNG->Uniform(CRange<Real>(-arenaSize[0]/2, arenaSize[0]/2));
+            double y = m_pcRNG->Uniform(CRange<Real>(-arenaSize[1]/2, arenaSize[1]/2));
+            if(abs(x)<arenaSize[0]/2-cornerRadius or abs(y)<arenaSize[1]/2-cornerRadius or Distance(CVector3(abs(x),abs(y),0),CVector3(arenaSize[0]/2-cornerRadius,arenaSize[1]/2-cornerRadius,0))<cornerRadius) {
+                cPosition.SetX(x);
+                cPosition.SetY(y);
 
-            cPosition.SetX(cRandomRadius * Cos(cRandomAngle));
-            cPosition.SetY(cRandomRadius * Sin(cRandomAngle));
+                CRadians cRandomOrientation = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
+                cOrientation.FromEulerAngles(cRandomOrientation, CRadians::ZERO, CRadians::ZERO);
 
-            CRadians cRandomOrientation = CRadians(m_pcRNG->Uniform(CRange<Real>(-CRadians::PI.GetValue(), CRadians::PI.GetValue())));
-            cOrientation.FromEulerAngles(cRandomOrientation, CRadians::ZERO, CRadians::ZERO);
-
-            bDone = MoveEntity(pcKB->GetEmbodiedEntity(), cPosition, cOrientation);
+                bDone = MoveEntity(pcKB->GetEmbodiedEntity(), cPosition, cOrientation);
+            }
             ++unTrials;
         } while(!bDone && unTrials <= MAX_PLACE_TRIALS);
         if(!bDone) {
@@ -180,22 +193,27 @@ void CAggregation::Destroy() {
 }*/
 
 void CAggregation::PostStep() {
+    int recordSteps = 100;
     int clock = GetSpace().GetSimulationClock();
-    if(clock%100==0) {
+    if(clock%recordSteps==0) 
         m_cOutFile << clock << " ";
-        for(unsigned int i=0; i<bots.size(); ++i) {
-            CKilobotEntity& kbEntity = *any_cast<CKilobotEntity*>(bots[i]);
+        
+    for(unsigned int i=0; i<bots.size(); ++i) {
+        CKilobotEntity& kbEntity = *any_cast<CKilobotEntity*>(bots[i]);
+        CKilobotCommunicationEntity kilocomm = kbEntity.GetKilobotCommunicationEntity();
+        if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS)
+            stayArray[i] = kilocomm.GetTxMessage()->data[0]!=0;
+        
+        int clock = GetSpace().GetSimulationClock();
+        if(clock%recordSteps==0) {
             Real Robot_X = kbEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetX();
             Real Robot_Y = kbEntity.GetEmbodiedEntity().GetOriginAnchor().Position.GetY();
-            CKilobotCommunicationEntity kilocomm = kbEntity.GetKilobotCommunicationEntity();
-            unsigned char word;
-            if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS)
-                word = kilocomm.GetTxMessage()->data[2];
-            
-            m_cOutFile << "( " << Robot_X << " , " << Robot_Y << " , " << ((unsigned int) word) << ") ";
+            m_cOutFile << "( " << Robot_X << " , " << Robot_Y << " , " << stayArray[i] << ") ";
         }
-        m_cOutFile<<endl;
     }
+    
+    if(clock%recordSteps==0)
+        m_cOutFile<<endl;
 }
 
 /****************************************/

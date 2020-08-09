@@ -6,7 +6,7 @@
   <!-- ************************* -->
   <framework>
     <system threads="0" />
-    <experiment length="30000"
+    <experiment length="3600"
                 ticks_per_second="10"
                 random_seed="0" />
   </framework>
@@ -14,8 +14,7 @@
   <!-- ****************** -->
   <!-- * Loop functions * -->
   <!-- ****************** -->
-  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" timeStopCond="0" />
-  <!--loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" output="test.txt" aParam="1.75" bParam="4" link="2" timeStopCond="0" /-->
+  <loop_functions library="build/language/loop_functions/aggregation_loop_functions/libaggregation_loop_functions" label="aggregation_loop_functions" nBots="25" cornerProportion="0.1" output="test.txt" timeStopCond="0" />
 
   <!-- *************** -->
   <!-- * Controllers * -->
@@ -24,12 +23,12 @@
 
     <kilobot_controller id="kbc">
       <actuators>
-        <differential_steering implementation="default" />
-        <leds implementation="default" medium="leds" />
+        <differential_steering implementation="default" bias_avg="0.000015" bias_stddev="0.00186"/>
+        <kilobot_led implementation="default" />
         <kilobot_communication implementation="default" />
       </actuators>
       <sensors>
-        <kilobot_communication implementation="default" medium="kilocomm" show_rays="true" />
+        <kilobot_communication implementation="default" medium="kilocomm" show_rays="false" />
       </sensors>
       <params behavior="build/language/behaviors/NG_agg" />
     </kilobot_controller>
@@ -39,7 +38,7 @@
   <!-- *********************** -->
   <!-- * Arena configuration * -->
   <!-- *********************** -->
-  <arena size="2, 2, 1" center="0,0,0.5">           
+  <arena size="1, 1, 1" center="0,0,0.5">           
 
   </arena>
 
@@ -55,7 +54,6 @@
   <!-- ********* -->
   <media>
     <kilobot_communication id="kilocomm" />
-    <led id="leds" />
   </media>
 
   <!-- ****************** -->
@@ -65,8 +63,7 @@
     <qt-opengl>
       <user_functions library="build/language/loop_functions/word_loop_functions/libword_loop_functions" label="word_qtuser_functions" />
       <camera>
-        <placement idx="0" position="0,0,0.9" look_at="0,0,0" lens_focal_length="12" />
-        <placement idx="1" position="0,0,0.9" look_at="0,0,0" lens_focal_length="20" />
+        <placement idx="0" position="0,0,0.9" look_at="0,0,0" lens_focal_length="20" />
       </camera>
     </qt-opengl>
   </visualization>

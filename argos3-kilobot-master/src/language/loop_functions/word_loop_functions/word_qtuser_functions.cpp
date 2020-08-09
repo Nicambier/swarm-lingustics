@@ -24,32 +24,29 @@ void CWORDQTUserFunctions::Draw(CKilobotEntity& c_kilobot_entity) {
    CKilobotCommunicationEntity kilocomm = c_kilobot_entity.GetKilobotCommunicationEntity();
    if(kilocomm.GetTxStatus()==CKilobotCommunicationEntity::TX_SUCCESS) {
         const message_t* temp = kilocomm.GetTxMessage();
-        if(temp->data[0]==WORD)
-            lastWord[c_kilobot_entity.GetId()] = temp;
+        //if(temp->data[0]==WORD)
+        lastWord[c_kilobot_entity.GetId()] = temp;
    }
    
    uint8_t a;
    uint8_t b;
    uint8_t c;
-   uint8_t n;
    bool exists=false;
    if(lastWord.find(c_kilobot_entity.GetId())!=lastWord.end()) {
        const message_t* m = lastWord[c_kilobot_entity.GetId()];
-       if(m->data[0]==WORD){
-           a = m->data[2];
-           b = m->data[3];
-           c = m->data[4];
-           n = m->data[6];
-           exists = true;
-       }
+        a = m->data[1];
+        b = m->data[2];
+        c = m->data[3];
+        exists = true;
    }
    
    if(exists) {
         //std::cout<<a<<" "<<b<<std::endl;
         //char c[] = {p,'\0'};
-        std::string p = std::to_string(c) + " " + std::to_string(a) + " " + std::to_string(b) + " "+ std::to_string(n);
-        DrawText(CVector3(0.02, 0.02, 0.01),   // position
-                    p.c_str()); // text
+        //std::string p = std::to_string(c) + " " + std::to_string(a) + " " + std::to_string(b) + " "+ std::to_string(n);
+        //DrawText(CVector3(0.02, 0.02, 0.01), p.c_str());
+        
+        //DrawCircle(CVector3(0, 0, 0.005), CQuaternion(0, 0, 0, 0), 0.04, CColor(c,a,b), true);
    }
 }
 

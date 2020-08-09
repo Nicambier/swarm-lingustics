@@ -1,13 +1,13 @@
 #!/bin/bash
     
 FILE='src/language/experiments/kilobot_naming_game.argos'
-FOLDER='new_paper_results'
+FOLDER='square_arena_5s'
 
-VERSIONS="2"
-SIZES="100"
+VERSIONS="0"
+SIZES="25 50 100"
 ITER="20"
 
-ROOMS="0.7 1.0 1.4"
+ROOMS="1.0 1.0 1.0"
 
 #THESE WILL NOT APPLY FOR VERSIONS=2
 A_PARAM="1.70"
@@ -15,7 +15,7 @@ B_PARAM="3.89"
 #"1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50 3.75 4.00 4.25 4.50 4.75 5.00"
 
 #THESE WILL ONLY APPLY FOR VERSIONS=2
-MUTATION="0.04"
+MUTATION="0.01"
 
 mkdir -p $FOLDER
 
@@ -35,7 +35,7 @@ do
     sleep 0.1
     for swarm in $SIZES
     do
-        sed -e 's/nBots=".*" out/nBots="'"$swarm"'" out/' tmp1 > tmp4
+        sed -e 's/nBots=".*" corner/nBots="'"$swarm"'" corner/' tmp1 > tmp4
 #         set -- $ROOMS
 #         if [ $swarm -eq 25 ] 
 #         then 
@@ -54,7 +54,7 @@ do
         
         if [ $version -eq 2 ]
         then
-            m=4
+            m=1
             for mut in $MUTATION
             do
                 #sed -i 's/mutation="[^\"]*"/mutation="'"$mut"'"/' ./tmp4

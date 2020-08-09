@@ -48,7 +48,9 @@ public:
     * It is executed every time you press the 'reset' button in the GUI.
     */
    
-   virtual void PlaceBots(float m_fArenaRadius);
+   virtual void PlaceQuarterCircleWall(CVector3 pos, double radius, unsigned int walls, unsigned int quadrant);
+   
+   virtual void PlaceBots(CVector3 arenaSize, double cornerRadius);
    //virtual void ConfigBots();
    
    virtual void Reset();
@@ -108,5 +110,6 @@ private:   /**
    unsigned char link;
    
    std::vector<CKilobotEntity*> bots;
+   bool* stayArray;
 
 };

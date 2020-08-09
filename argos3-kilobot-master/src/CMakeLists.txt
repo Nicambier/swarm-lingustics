@@ -57,6 +57,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/ARGoSPackaging.cmake)
 #
 # Compile stuff
 #
-add_subdirectory(language)
 add_subdirectory(plugins)
 add_subdirectory(examples)
+add_subdirectory(language)
