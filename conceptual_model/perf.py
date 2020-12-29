@@ -23,10 +23,10 @@ for i in range(len(sizes)):
 #col=["blue","cyan","red","pink","grey","green","orange"]
 
 if(boxplot):
-    col=["green","blue","red"]
+    col=['#601A4A','#63ACBE','#EE442F','#F9F4EC']#["green","blue","red"]
     ls=["-","-","-","--"]
     lab=["PA-CE m=0.01","PA-CE m=0.001","Fixed optimal"]
-    folders = ['lowDensity2/103wpSIZEm10/','lowDensity2/103wpSIZEm1/','optiLow2/101pSIZEopti/']
+    folders = ['highDensity2/103wpSIZEm10/','highDensity2/103wpSIZEm1/','optiHigh2/101pSIZEopti/']
 else:
     col=["green","blue","red","orange"]
     ls=["-","-","-","--"]
@@ -137,7 +137,7 @@ axes[1][len(sizes)-1].legend(dummyLines,["Clusters","Free Agents"],loc='lower le
 lgd = axes[1][1].legend(axes[0][0].get_lines(),lab,loc='lower right', bbox_to_anchor=(2.2, -0.5), ncol=4, fancybox=True, shadow=True, fontsize=12)
 art=[lgd]
 if(boxplot):
-    plt.savefig(directory+'/timeEvol_boxplot.png',additional_artists=art,bbox_inches='tight')
+    plt.savefig(directory+'/timeEvol_high_paper.png',additional_artists=art,bbox_inches='tight')
 else:
     plt.savefig(directory+'/timeEvol.png',additional_artists=art,bbox_inches='tight')
 

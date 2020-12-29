@@ -16,12 +16,14 @@ include(ARGoSCheckQTOpenGL)
 #
 # Find Lua
 #
-find_package(Lua52 REQUIRED)
+find_package(Lua53 REQUIRED)
 
 #
 # Look for librt, necessary on some platforms
 #
-find_package(RT)
+if(NOT APPLE)
+  find_package(RT)
+endif(NOT APPLE)
 
 #
 # Set ARGoS include dir

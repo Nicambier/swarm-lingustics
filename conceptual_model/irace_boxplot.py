@@ -20,7 +20,7 @@ sizes = [25,50,100,200]
 dens = ["high","low"]
 dens_labels = ["High density","Low density"]
 
-col = ['#D7191C','#2C7BB6']
+col = ['#F5793A','#A95AA1']
 
 perf = {}
 

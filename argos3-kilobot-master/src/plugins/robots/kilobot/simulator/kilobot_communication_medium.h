@@ -7,7 +7,6 @@ namespace argos {
    class CKilobotEntity;
 }
 
-#include <unordered_map>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/simulator/medium/medium.h>
 #include <argos3/core/simulator/space/positional_indices/positional_index.h>
@@ -111,7 +110,7 @@ namespace argos {
       CKilobotCommunicationEntityGridEntityUpdater* m_pcGridUpdateOperation;
 
       /** A list of messages set through SendOHCMessageTo() */
-      std::unordered_map<ssize_t, message_t*> m_mapOHCMessages;
+      unordered_map<ssize_t, message_t*> m_mapOHCMessages;
 
       /** Random number generator */
       CRandom::CRNG* m_pcRNG;
